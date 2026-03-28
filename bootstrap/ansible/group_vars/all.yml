@@ -1,0 +1,8 @@
+k3s_install_channel: stable
+k3s_disable_components:
+  - traefik
+  - servicelb
+common_packages:
+  - curl
+  - jq
+  - qemu-guest-agent

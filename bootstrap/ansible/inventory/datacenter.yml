@@ -1,0 +1,15 @@
+all:
+  vars:
+    ansible_user: ubuntu
+    ansible_ssh_private_key_file: "{{ lookup('env', 'SSH_PRIVATE_KEY_PATH') }}"
+    k3s_token: "{{ lookup('env', 'K3S_CLUSTER_TOKEN') }}"
+    k3s_server_url: "https://10.100.1.111:6443"
+  children:
+    control_plane:
+      hosts:
+        cp-1:
+          ansible_host: 10.100.1.111
+        cp-2:
+          ansible_host: 10.100.1.112
+        cp-3:
+          ansible_host: 10.100.1.113

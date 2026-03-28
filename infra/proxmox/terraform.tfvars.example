@@ -1,0 +1,44 @@
+pve1_api_url          = "https://10.100.1.100:8006/api2/json"
+pve1_api_token_id     = "terraform@pve!codex"
+pve1_api_token_secret = "codex-datacenter-token"
+pve1_node             = "pve-1"
+pve1_storage          = "local-lvm"
+pve1_bridge           = "vmbr0"
+pve1_template_vm_id   = 9000
+
+pve2_api_url          = "https://10.100.1.101:8006/api2/json"
+pve2_api_token_id     = "terraform@pve!codex"
+pve2_api_token_secret = "codex-datacenter-token"
+pve2_node             = "pve-2"
+pve2_storage          = "local-lvm"
+pve2_bridge           = "vmbr0"
+pve2_template_vm_id   = 9000
+
+ssh_public_key = "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIBootstrapDatacenterKey codex@datacenter"
+
+control_plane_vms = {
+  cp-1 = {
+    vm_id        = 201
+    ip           = "10.100.1.111"
+    cores        = 2
+    memory       = 4096
+    disk_gb      = 40
+    proxmox_host = "pve1"
+  }
+  cp-2 = {
+    vm_id        = 202
+    ip           = "10.100.1.112"
+    cores        = 2
+    memory       = 4096
+    disk_gb      = 40
+    proxmox_host = "pve1"
+  }
+  cp-3 = {
+    vm_id        = 301
+    ip           = "10.100.1.113"
+    cores        = 2
+    memory       = 4096
+    disk_gb      = 40
+    proxmox_host = "pve2"
+  }
+}

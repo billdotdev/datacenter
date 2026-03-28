@@ -5,11 +5,10 @@ test -f Makefile
 test -f bootstrap/config/datacenter.example.env
 test -f bootstrap/scripts/validate-env.sh
 
-grep -q '^PROXMOX_API_URL=' bootstrap/config/datacenter.example.env
-grep -q '^PROXMOX_API_TOKEN_ID=' bootstrap/config/datacenter.example.env
+grep -q '^PVE1_API_URL=' bootstrap/config/datacenter.example.env
+grep -q '^PVE2_API_URL=' bootstrap/config/datacenter.example.env
 grep -q '^K3S_INSTALL_CHANNEL=' bootstrap/config/datacenter.example.env
-grep -q '^KUBECONFIG_PATH=' bootstrap/config/datacenter.example.env
-grep -q '^CP3_SSH_HOST=' bootstrap/config/datacenter.example.env
+grep -q '^SSH_USER=' bootstrap/config/datacenter.example.env
 grep -q 'bootstrap-validate:' Makefile
 
 run_validate() {
@@ -51,32 +50,45 @@ side_effect_marker="$(mktemp)"
 trap 'rm -f "$missing_kube_env" "$valid_home_env" "$command_substitution_env" "$invalid_line_env" "$invalid_name_env" "$missing_output" "$passing_output" "$command_substitution_output" "$invalid_line_output" "$invalid_name_output" "$side_effect_marker"' EXIT
 
 cat <<'EOF' >"$missing_kube_env"
-PROXMOX_API_URL=https://10.100.1.100:8006/api2/json
-PROXMOX_API_TOKEN_ID=terraform@pve!codex
-PROXMOX_API_TOKEN_SECRET=codex-datacenter-token
-PROXMOX_NODE=host-a
-PROXMOX_STORAGE=local-lvm
-PROXMOX_BRIDGE=vmbr0
-PROXMOX_TEMPLATE_VM_ID=9000
+PVE1_API_URL=https://10.100.1.100:8006/api2/json
+PVE1_API_TOKEN_ID=terraform@pve!codex
+PVE1_API_TOKEN_SECRET=codex-datacenter-token
+PVE1_NODE=pve-1
+PVE1_STORAGE=local-lvm
+PVE1_BRIDGE=vmbr0
+PVE1_TEMPLATE_VM_ID=9000
+PVE2_API_URL=https://10.100.1.101:8006/api2/json
+PVE2_API_TOKEN_ID=terraform@pve!codex
+PVE2_API_TOKEN_SECRET=codex-datacenter-token
+PVE2_NODE=pve-2
+PVE2_STORAGE=local-lvm
+PVE2_BRIDGE=vmbr0
+PVE2_TEMPLATE_VM_ID=9000
 CLUSTER_NAME=datacenter
 K3S_INSTALL_CHANNEL=stable
 K3S_CLUSTER_TOKEN=datacenter-lab-bootstrap-token
 CP1_IP=10.100.1.111
 CP2_IP=10.100.1.112
 CP3_IP=10.100.1.113
-CP3_SSH_HOST=10.100.1.113
-CP3_SSH_USER=ubuntu
+SSH_USER=ubuntu
 SSH_PRIVATE_KEY_PATH=/tmp/id_ed25519
 EOF
 
 cat <<'EOF' >"$valid_home_env"
-PROXMOX_API_URL=https://10.100.1.100:8006/api2/json
-PROXMOX_API_TOKEN_ID=terraform@pve!codex
-PROXMOX_API_TOKEN_SECRET=codex-datacenter-token
-PROXMOX_NODE=host-a
-PROXMOX_STORAGE=local-lvm
-PROXMOX_BRIDGE=vmbr0
-PROXMOX_TEMPLATE_VM_ID=9000
+PVE1_API_URL=https://10.100.1.100:8006/api2/json
+PVE1_API_TOKEN_ID=terraform@pve!codex
+PVE1_API_TOKEN_SECRET=codex-datacenter-token
+PVE1_NODE=pve-1
+PVE1_STORAGE=local-lvm
+PVE1_BRIDGE=vmbr0
+PVE1_TEMPLATE_VM_ID=9000
+PVE2_API_URL=https://10.100.1.101:8006/api2/json
+PVE2_API_TOKEN_ID=terraform@pve!codex
+PVE2_API_TOKEN_SECRET=codex-datacenter-token
+PVE2_NODE=pve-2
+PVE2_STORAGE=local-lvm
+PVE2_BRIDGE=vmbr0
+PVE2_TEMPLATE_VM_ID=9000
 CLUSTER_NAME=datacenter
 K3S_INSTALL_CHANNEL=stable
 K3S_CLUSTER_TOKEN=datacenter-lab-bootstrap-token
@@ -84,19 +96,25 @@ KUBECONFIG_PATH=$HOME/.kube/datacenter.kubeconfig
 CP1_IP=10.100.1.111
 CP2_IP=10.100.1.112
 CP3_IP=10.100.1.113
-CP3_SSH_HOST=10.100.1.113
-CP3_SSH_USER=ubuntu
+SSH_USER=ubuntu
 SSH_PRIVATE_KEY_PATH=$HOME/.ssh/id_ed25519
 EOF
 
 cat <<EOF >"$command_substitution_env"
-PROXMOX_API_URL=https://10.100.1.100:8006/api2/json
-PROXMOX_API_TOKEN_ID=terraform@pve!codex
-PROXMOX_API_TOKEN_SECRET=codex-datacenter-token
-PROXMOX_NODE=host-a
-PROXMOX_STORAGE=local-lvm
-PROXMOX_BRIDGE=vmbr0
-PROXMOX_TEMPLATE_VM_ID=9000
+PVE1_API_URL=https://10.100.1.100:8006/api2/json
+PVE1_API_TOKEN_ID=terraform@pve!codex
+PVE1_API_TOKEN_SECRET=codex-datacenter-token
+PVE1_NODE=pve-1
+PVE1_STORAGE=local-lvm
+PVE1_BRIDGE=vmbr0
+PVE1_TEMPLATE_VM_ID=9000
+PVE2_API_URL=https://10.100.1.101:8006/api2/json
+PVE2_API_TOKEN_ID=terraform@pve!codex
+PVE2_API_TOKEN_SECRET=codex-datacenter-token
+PVE2_NODE=pve-2
+PVE2_STORAGE=local-lvm
+PVE2_BRIDGE=vmbr0
+PVE2_TEMPLATE_VM_ID=9000
 CLUSTER_NAME=datacenter
 K3S_INSTALL_CHANNEL=stable
 K3S_CLUSTER_TOKEN=datacenter-lab-bootstrap-token
@@ -104,19 +122,18 @@ KUBECONFIG_PATH=/tmp/datacenter.kubeconfig
 CP1_IP=10.100.1.111
 CP2_IP=10.100.1.112
 CP3_IP=10.100.1.113
-CP3_SSH_HOST=10.100.1.113
-CP3_SSH_USER=ubuntu
+SSH_USER=ubuntu
 SSH_PRIVATE_KEY_PATH=/tmp/id_ed25519
 UNRELATED=\$(touch "$side_effect_marker")literal-value
 EOF
 
 cat <<'EOF' >"$invalid_line_env"
-PROXMOX_API_URL=https://10.100.1.100:8006/api2/json
+PVE1_API_URL=https://10.100.1.100:8006/api2/json
 NOT_A_VALID_LINE
 EOF
 
 cat <<'EOF' >"$invalid_name_env"
-PROXMOX_API_URL=https://10.100.1.100:8006/api2/json
+PVE1_API_URL=https://10.100.1.100:8006/api2/json
 INVALID-NAME=value
 EOF
 
