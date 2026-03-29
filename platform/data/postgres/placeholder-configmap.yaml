@@ -1,0 +1,7 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: postgres-bootstrap-placeholder
+  namespace: database
+data:
+  placeholder: "true"

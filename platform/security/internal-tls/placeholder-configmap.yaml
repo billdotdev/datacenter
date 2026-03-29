@@ -1,0 +1,7 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: internal-tls-bootstrap-placeholder
+  namespace: cert-manager
+data:
+  placeholder: "true"
