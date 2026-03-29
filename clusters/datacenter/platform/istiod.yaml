@@ -13,6 +13,13 @@ spec:
       name: istio-validator-istio-system
       jqPathExpressions:
         - '.webhooks[]?.clientConfig.caBundle'
+        - '.webhooks[]?.clientConfig.service.port'
+        - '.webhooks[]?.failurePolicy'
+        - '.webhooks[]?.matchPolicy'
+        - '.webhooks[]?.namespaceSelector'
+        - '.webhooks[]?.objectSelector'
+        - '.webhooks[]?.rules[]?.scope'
+        - '.webhooks[]?.timeoutSeconds'
   sources:
     - repoURL: https://istio-release.storage.googleapis.com/charts
       chart: istiod

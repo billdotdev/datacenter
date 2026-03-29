@@ -37,16 +37,38 @@ spec:
       name: chaos-mesh-mutation
       jqPathExpressions:
         - '.webhooks[]?.clientConfig.caBundle'
+        - '.webhooks[]?.clientConfig.service.port'
+        - '.webhooks[]?.failurePolicy'
+        - '.webhooks[]?.matchPolicy'
+        - '.webhooks[]?.namespaceSelector'
+        - '.webhooks[]?.objectSelector'
+        - '.webhooks[]?.reinvocationPolicy'
+        - '.webhooks[]?.rules[]?.scope'
+        - '.webhooks[]?.timeoutSeconds'
     - group: admissionregistration.k8s.io
       kind: ValidatingWebhookConfiguration
       name: chaos-mesh-validation
       jqPathExpressions:
         - '.webhooks[]?.clientConfig.caBundle'
+        - '.webhooks[]?.clientConfig.service.port'
+        - '.webhooks[]?.failurePolicy'
+        - '.webhooks[]?.matchPolicy'
+        - '.webhooks[]?.namespaceSelector'
+        - '.webhooks[]?.objectSelector'
+        - '.webhooks[]?.rules[]?.scope'
+        - '.webhooks[]?.timeoutSeconds'
     - group: admissionregistration.k8s.io
       kind: ValidatingWebhookConfiguration
       name: chaos-mesh-validation-auth
       jqPathExpressions:
         - '.webhooks[]?.clientConfig.caBundle'
+        - '.webhooks[]?.clientConfig.service.port'
+        - '.webhooks[]?.failurePolicy'
+        - '.webhooks[]?.matchPolicy'
+        - '.webhooks[]?.namespaceSelector'
+        - '.webhooks[]?.objectSelector'
+        - '.webhooks[]?.rules[]?.scope'
+        - '.webhooks[]?.timeoutSeconds'
   destination:
     server: https://kubernetes.default.svc
     namespace: chaos-mesh
