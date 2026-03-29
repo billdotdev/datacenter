@@ -18,3 +18,14 @@ kubectl -n observability port-forward svc/kube-prometheus-stack-grafana 3000:80
 ```bash
 kubectl -n observability port-forward svc/kube-prometheus-stack-prometheus 9090
 ```
+
+## Dashboard
+
+Add a local host entry for the shared gateway IP, then open the dashboard in a browser.
+
+```bash
+echo '10.100.0.240 dashboard.datacenter.lan' | sudo tee -a /etc/hosts
+open https://dashboard.datacenter.lan
+```
+
+The dashboard `Deployment` expects the image `ghcr.io/billdotdev/datacenter-dashboard:main`. Push `main`, wait for the `Dashboard Image` GitHub Actions workflow to publish the image, then let Argo CD sync the `dashboard` application.
