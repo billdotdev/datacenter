@@ -8,6 +8,13 @@ assert_contains() {
   grep -Fq "$expected" "$file"
 }
 
+assert_not_contains() {
+  local file=$1
+  local unexpected=$2
+
+  ! grep -Fq "$unexpected" "$file"
+}
+
 assert_block_contains() {
   local file=$1
   local start=$2
@@ -20,7 +27,6 @@ assert_block_contains() {
 test -f platform/security/istio/istiod-values.yaml
 test -f platform/security/cert-manager/values.yaml
 test -f platform/security/gateway-api/shared-gateway/kustomization.yaml
-test -f platform/security/gateway-api/shared-gateway/namespace.yaml
 test -f platform/security/gateway-api/shared-gateway/gateway.yaml
 test -f platform/security/internal-tls/kustomization.yaml
 test -f platform/security/internal-tls/namespace.yaml
@@ -36,9 +42,8 @@ assert_contains platform/security/istio/istiod-values.yaml 'profile: minimal'
 assert_contains platform/security/istio/istiod-values.yaml 'accessLogFile: /dev/stdout'
 assert_contains platform/security/istio/istiod-values.yaml 'replicaCount: 2'
 
-assert_contains platform/security/gateway-api/shared-gateway/kustomization.yaml 'namespace.yaml'
 assert_contains platform/security/gateway-api/shared-gateway/kustomization.yaml 'gateway.yaml'
-assert_contains platform/security/gateway-api/shared-gateway/namespace.yaml 'name: istio-ingress'
+assert_not_contains platform/security/gateway-api/shared-gateway/kustomization.yaml 'namespace.yaml'
 assert_contains platform/security/gateway-api/shared-gateway/gateway.yaml 'kind: Gateway'
 assert_contains platform/security/gateway-api/shared-gateway/gateway.yaml 'name: shared-gateway'
 assert_contains platform/security/gateway-api/shared-gateway/gateway.yaml 'namespace: istio-ingress'

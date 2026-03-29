@@ -15,6 +15,64 @@ assert_not_contains() {
   ! grep -Fq "$unexpected" "$file"
 }
 
+assert_no_duplicate_resources() {
+  local rendered=$1
+  local duplicates
+
+  duplicates=$(
+    awk '
+      BEGIN {
+        RS="---"
+        FS="\n"
+      }
+      {
+        apiVersion=""
+        kind=""
+        name=""
+        namespace=""
+        inMetadata=0
+
+        for (i = 1; i <= NF; i++) {
+          line = $i
+          sub(/\r$/, "", line)
+
+          if (line == "metadata:") {
+            inMetadata=1
+            continue
+          }
+
+          if (line ~ /^[^ ]/ && line != "metadata:") {
+            inMetadata=0
+          }
+
+          if (line ~ /^apiVersion:/ && apiVersion == "") {
+            sub(/^apiVersion:[[:space:]]*/, "", line)
+            apiVersion=line
+          } else if (line ~ /^kind:/ && kind == "") {
+            sub(/^kind:[[:space:]]*/, "", line)
+            kind=line
+          } else if (inMetadata && line ~ /^  name:/ && name == "") {
+            sub(/^  name:[[:space:]]*/, "", line)
+            name=line
+          } else if (inMetadata && line ~ /^  namespace:/ && namespace == "") {
+            sub(/^  namespace:[[:space:]]*/, "", line)
+            namespace=line
+          }
+        }
+
+        if (apiVersion != "" && kind != "" && name != "") {
+          if (namespace == "") {
+            namespace="_cluster"
+          }
+          print apiVersion "|" kind "|" namespace "|" name
+        }
+      }
+    ' "$rendered" | sort | uniq -d
+  )
+
+  test -z "$duplicates"
+}
+
 test -f clusters/datacenter/platform/kustomization.yaml
 test -f clusters/datacenter/platform/gateway-api-crds.yaml
 test -f clusters/datacenter/platform/istio-base.yaml
@@ -58,10 +116,9 @@ assert_contains platform/security/istio/istiod-values.yaml 'replicaCount: 2'
 
 assert_contains clusters/datacenter/platform/gateway-shared.yaml 'path: platform/security/gateway-api/shared-gateway'
 test -f platform/security/gateway-api/shared-gateway/kustomization.yaml
-test -f platform/security/gateway-api/shared-gateway/namespace.yaml
 test -f platform/security/gateway-api/shared-gateway/gateway.yaml
-assert_contains platform/security/gateway-api/shared-gateway/kustomization.yaml 'namespace.yaml'
 assert_contains platform/security/gateway-api/shared-gateway/kustomization.yaml 'gateway.yaml'
+assert_not_contains platform/security/gateway-api/shared-gateway/kustomization.yaml 'namespace.yaml'
 assert_not_contains platform/security/gateway-api/shared-gateway/kustomization.yaml 'placeholder-configmap.yaml'
 assert_contains platform/security/gateway-api/shared-gateway/gateway.yaml 'kind: Gateway'
 assert_contains platform/security/gateway-api/shared-gateway/gateway.yaml 'name: shared-gateway'
@@ -125,3 +182,11 @@ kubectl kustomize clusters/datacenter/platform >/dev/null
 kubectl kustomize platform/security/gateway-api/shared-gateway >/dev/null
 kubectl kustomize platform/security/internal-tls >/dev/null
 kubectl kustomize platform/data/postgres >/dev/null
+
+rendered_resources=$(mktemp)
+trap 'rm -f "$rendered_resources"' EXIT
+{
+  kubectl kustomize platform/security/internal-tls
+  kubectl kustomize platform/security/gateway-api/shared-gateway
+} >"$rendered_resources"
+assert_no_duplicate_resources "$rendered_resources"
