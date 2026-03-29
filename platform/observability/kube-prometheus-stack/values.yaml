@@ -8,9 +8,32 @@ grafana:
   grafana.ini:
     server:
       root_url: https://grafana.datacenter.lan
+  resources:
+    requests:
+      cpu: 25m
+      memory: 128Mi
+    limits:
+      cpu: 250m
+      memory: 256Mi
+kube-state-metrics:
+  resources:
+    requests:
+      cpu: 25m
+      memory: 64Mi
+    limits:
+      cpu: 150m
+      memory: 128Mi
 prometheus:
   prometheusSpec:
     retention: 7d
+    walCompression: true
+    resources:
+      requests:
+        cpu: 250m
+        memory: 768Mi
+      limits:
+        cpu: 750m
+        memory: 1Gi
     storageSpec:
       volumeClaimTemplate:
         spec:
@@ -20,5 +43,21 @@ prometheus:
           resources:
             requests:
               storage: 20Gi
+prometheusOperator:
+  resources:
+    requests:
+      cpu: 25m
+      memory: 64Mi
+    limits:
+      cpu: 200m
+      memory: 128Mi
+prometheus-node-exporter:
+  resources:
+    requests:
+      cpu: 10m
+      memory: 32Mi
+    limits:
+      cpu: 100m
+      memory: 64Mi
 alertmanager:
   enabled: false

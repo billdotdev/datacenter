@@ -13,6 +13,13 @@ loki:
     retention_period: 168h
 singleBinary:
   replicas: 1
+  resources:
+    requests:
+      cpu: 100m
+      memory: 256Mi
+    limits:
+      cpu: 500m
+      memory: 512Mi
 backend:
   replicas: 0
 read:
@@ -21,10 +28,17 @@ write:
   replicas: 0
 gateway:
   enabled: true
+  resources:
+    requests:
+      cpu: 10m
+      memory: 32Mi
+    limits:
+      cpu: 100m
+      memory: 64Mi
 monitoring:
   serviceMonitor:
     enabled: true
 chunksCache:
-  allocatedMemory: 1024
+  allocatedMemory: 256
 resultsCache:
-  allocatedMemory: 512
+  allocatedMemory: 128
