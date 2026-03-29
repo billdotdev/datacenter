@@ -90,19 +90,37 @@ test -f clusters/datacenter/platform/loki.yaml
 test -f clusters/datacenter/platform/promtail.yaml
 test -f clusters/datacenter/platform/chaos-mesh.yaml
 test -f platform/gitops/argocd/bootstrap/argocd-cm-application-health.yaml
+test -f platform/gitops/argocd/bootstrap/argocd-application-controller-resources.yaml
+test -f platform/gitops/argocd/bootstrap/argocd-server-resources.yaml
+test -f platform/gitops/argocd/bootstrap/argocd-dex-server-resources.yaml
+test -f platform/gitops/argocd/bootstrap/argocd-redis-resources.yaml
 test -f platform/gitops/argocd/bootstrap/argocd-repo-server-hardening.yaml
 
 assert_contains clusters/datacenter/kustomization.yaml '  - platform'
 assert_not_contains clusters/datacenter/kustomization.yaml '  - root-application.yaml'
 assert_contains platform/gitops/argocd/bootstrap/kustomization.yaml 'argocd-cm-application-health.yaml'
+assert_contains platform/gitops/argocd/bootstrap/kustomization.yaml 'argocd-application-controller-resources.yaml'
+assert_contains platform/gitops/argocd/bootstrap/kustomization.yaml 'argocd-server-resources.yaml'
+assert_contains platform/gitops/argocd/bootstrap/kustomization.yaml 'argocd-dex-server-resources.yaml'
+assert_contains platform/gitops/argocd/bootstrap/kustomization.yaml 'argocd-redis-resources.yaml'
 assert_contains platform/gitops/argocd/bootstrap/kustomization.yaml 'argocd-repo-server-hardening.yaml'
 assert_contains platform/gitops/argocd/bootstrap/argocd-cm-application-health.yaml 'kind: ConfigMap'
 assert_contains platform/gitops/argocd/bootstrap/argocd-cm-application-health.yaml 'name: argocd-cm'
 assert_contains platform/gitops/argocd/bootstrap/argocd-cm-application-health.yaml 'resource.customizations: |'
 assert_contains platform/gitops/argocd/bootstrap/argocd-cm-application-health.yaml 'argoproj.io/Application:'
 assert_contains platform/gitops/argocd/bootstrap/argocd-cm-application-health.yaml 'health.lua: |'
+assert_contains platform/gitops/argocd/bootstrap/argocd-application-controller-resources.yaml 'kind: StatefulSet'
+assert_contains platform/gitops/argocd/bootstrap/argocd-application-controller-resources.yaml 'name: argocd-application-controller'
+assert_contains platform/gitops/argocd/bootstrap/argocd-application-controller-resources.yaml 'memory: 1Gi'
+assert_contains platform/gitops/argocd/bootstrap/argocd-server-resources.yaml 'name: argocd-server'
+assert_contains platform/gitops/argocd/bootstrap/argocd-server-resources.yaml 'memory: 192Mi'
+assert_contains platform/gitops/argocd/bootstrap/argocd-dex-server-resources.yaml 'name: argocd-dex-server'
+assert_contains platform/gitops/argocd/bootstrap/argocd-dex-server-resources.yaml 'memory: 256Mi'
+assert_contains platform/gitops/argocd/bootstrap/argocd-redis-resources.yaml 'name: argocd-redis'
+assert_contains platform/gitops/argocd/bootstrap/argocd-redis-resources.yaml 'memory: 128Mi'
 assert_contains platform/gitops/argocd/bootstrap/argocd-repo-server-hardening.yaml 'replicas: 2'
 assert_contains platform/gitops/argocd/bootstrap/argocd-repo-server-hardening.yaml 'ln -sf'
+assert_contains platform/gitops/argocd/bootstrap/argocd-repo-server-hardening.yaml 'memory: 256Mi'
 
 assert_contains clusters/datacenter/platform/kustomization.yaml 'gateway-api-crds.yaml'
 assert_contains clusters/datacenter/platform/kustomization.yaml 'istiod.yaml'

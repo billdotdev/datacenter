@@ -14,6 +14,13 @@ spec:
     storageClass: local-path
   monitoring:
     enablePodMonitor: true
+  resources:
+    requests:
+      cpu: 100m
+      memory: 256Mi
+    limits:
+      cpu: 500m
+      memory: 512Mi
   bootstrap:
     initdb:
       database: datacenter
