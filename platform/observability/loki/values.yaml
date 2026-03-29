@@ -11,6 +11,12 @@ loki:
     retention_period: 168h
 singleBinary:
   replicas: 1
+backend:
+  replicas: 0
+read:
+  replicas: 0
+write:
+  replicas: 0
 gateway:
   enabled: true
 monitoring:
