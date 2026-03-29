@@ -47,6 +47,8 @@ assert_contains clusters/datacenter/platform/postgres-cluster.yaml 'path: platfo
 test -f platform/data/postgres/kustomization.yaml
 
 assert_contains clusters/datacenter/platform/cert-manager.yaml 'argocd.argoproj.io/sync-wave: "0"'
+assert_contains clusters/datacenter/platform/kube-prometheus-stack.yaml 'argocd.argoproj.io/sync-wave: "0"'
+assert_contains clusters/datacenter/platform/ingress-nginx.yaml 'argocd.argoproj.io/sync-wave: "1"'
 assert_contains clusters/datacenter/platform/postgres-operator.yaml 'argocd.argoproj.io/sync-wave: "0"'
 assert_contains clusters/datacenter/platform/internal-tls.yaml 'argocd.argoproj.io/sync-wave: "1"'
 assert_contains clusters/datacenter/platform/postgres-cluster.yaml 'argocd.argoproj.io/sync-wave: "1"'
