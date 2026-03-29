@@ -9,6 +9,7 @@ resources:
   - internal-tls.yaml
   - postgres-operator.yaml
   - postgres-cluster.yaml
+  - prometheus-operator-crds.yaml
   - kube-prometheus-stack.yaml
   - loki.yaml
   - promtail.yaml

@@ -82,6 +82,7 @@ test -f clusters/datacenter/platform/cert-manager.yaml
 test -f clusters/datacenter/platform/internal-tls.yaml
 test -f clusters/datacenter/platform/postgres-operator.yaml
 test -f clusters/datacenter/platform/postgres-cluster.yaml
+test -f clusters/datacenter/platform/prometheus-operator-crds.yaml
 test -f clusters/datacenter/platform/kube-prometheus-stack.yaml
 test -f clusters/datacenter/platform/loki.yaml
 test -f clusters/datacenter/platform/promtail.yaml
@@ -151,6 +152,12 @@ assert_contains platform/data/cloudnative-pg/operator/operator-config-patch.yaml
 assert_contains clusters/datacenter/platform/kube-prometheus-stack.yaml '$values/platform/observability/kube-prometheus-stack/values.yaml'
 assert_contains clusters/datacenter/platform/kube-prometheus-stack.yaml 'ServerSideApply=true'
 test -f platform/observability/kube-prometheus-stack/values.yaml
+assert_contains platform/observability/kube-prometheus-stack/values.yaml 'crds:'
+assert_contains platform/observability/kube-prometheus-stack/values.yaml 'enabled: false'
+
+assert_contains clusters/datacenter/platform/prometheus-operator-crds.yaml 'chart: prometheus-operator-crds'
+assert_contains clusters/datacenter/platform/prometheus-operator-crds.yaml 'targetRevision: 25.0.0'
+assert_contains clusters/datacenter/platform/prometheus-operator-crds.yaml 'ServerSideApply=true'
 
 assert_contains clusters/datacenter/platform/loki.yaml '$values/platform/observability/loki/values.yaml'
 test -f platform/observability/loki/values.yaml
@@ -194,10 +201,11 @@ assert_contains clusters/datacenter/platform/istiod.yaml 'argocd.argoproj.io/syn
 assert_contains clusters/datacenter/platform/gateway-shared.yaml 'argocd.argoproj.io/sync-wave: "3"'
 assert_contains clusters/datacenter/platform/cert-manager.yaml 'argocd.argoproj.io/sync-wave: "1"'
 assert_contains clusters/datacenter/platform/postgres-operator.yaml 'argocd.argoproj.io/sync-wave: "1"'
-assert_contains clusters/datacenter/platform/kube-prometheus-stack.yaml 'argocd.argoproj.io/sync-wave: "1"'
 assert_contains clusters/datacenter/platform/chaos-mesh.yaml 'argocd.argoproj.io/sync-wave: "1"'
 assert_contains clusters/datacenter/platform/internal-tls.yaml 'argocd.argoproj.io/sync-wave: "2"'
 assert_contains clusters/datacenter/platform/postgres-cluster.yaml 'argocd.argoproj.io/sync-wave: "2"'
+assert_contains clusters/datacenter/platform/prometheus-operator-crds.yaml 'argocd.argoproj.io/sync-wave: "1"'
+assert_contains clusters/datacenter/platform/kube-prometheus-stack.yaml 'argocd.argoproj.io/sync-wave: "2"'
 assert_contains clusters/datacenter/platform/loki.yaml 'argocd.argoproj.io/sync-wave: "2"'
 assert_contains clusters/datacenter/platform/promtail.yaml 'argocd.argoproj.io/sync-wave: "3"'
 

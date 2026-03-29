@@ -12,6 +12,8 @@ test -f platform/observability/kube-prometheus-stack/values.yaml
 test -f platform/observability/loki/values.yaml
 test -f platform/observability/promtail/values.yaml
 
+assert_contains platform/observability/kube-prometheus-stack/values.yaml 'crds:'
+assert_contains platform/observability/kube-prometheus-stack/values.yaml 'enabled: false'
 assert_contains platform/observability/kube-prometheus-stack/values.yaml 'grafana:'
 assert_contains platform/observability/kube-prometheus-stack/values.yaml 'retention: 7d'
 assert_contains platform/observability/kube-prometheus-stack/values.yaml 'storageClassName: local-path'

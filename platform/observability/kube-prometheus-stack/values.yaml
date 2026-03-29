@@ -1,3 +1,5 @@
+crds:
+  enabled: false
 grafana:
   enabled: true
   adminPassword: changeme-before-prod
