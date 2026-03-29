@@ -20,6 +20,7 @@ assert_contains platform/observability/kube-prometheus-stack/values.yaml 'storag
 assert_contains platform/observability/kube-prometheus-stack/values.yaml 'adminPassword: changeme-before-prod'
 assert_contains platform/observability/loki/values.yaml 'useTestSchema: true'
 assert_contains platform/observability/loki/values.yaml 'retention_period: 168h'
+assert_contains platform/observability/loki/values.yaml 'delete_request_store: filesystem'
 assert_contains platform/observability/loki/values.yaml 'replication_factor: 1'
 assert_contains platform/observability/loki/values.yaml 'deploymentMode: SingleBinary'
 assert_contains platform/observability/loki/values.yaml 'gateway:'
