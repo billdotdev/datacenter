@@ -7,19 +7,13 @@ metadata:
     argocd.argoproj.io/sync-wave: "1"
 spec:
   project: datacenter
-  sources:
-    - repoURL: https://cloudnative-pg.github.io/charts
-      chart: cloudnative-pg
-      targetRevision: 0.26.1
-      helm:
-        valueFiles:
-          - $values/platform/data/cloudnative-pg/values.yaml
-    - repoURL: https://github.com/billdotdev/datacenter.git
-      targetRevision: main
-      ref: values
+  source:
+    repoURL: https://github.com/billdotdev/datacenter.git
+    targetRevision: main
+    path: platform/data/cloudnative-pg/operator
   destination:
     server: https://kubernetes.default.svc
-    namespace: database
+    namespace: cnpg-system
   syncPolicy:
     automated:
       prune: true

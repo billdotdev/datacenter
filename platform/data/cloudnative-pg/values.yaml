@@ -1,7 +1,0 @@
-config:
-  data:
-    INHERITED_ANNOTATIONS: argocd.argoproj.io/sync-wave
-monitoring:
-  podMonitorEnabled: true
-crds:
-  create: true

@@ -136,12 +136,14 @@ assert_contains platform/security/gateway-api/shared-gateway/gateway.yaml 'from:
 assert_contains clusters/datacenter/platform/cert-manager.yaml '$values/platform/security/cert-manager/values.yaml'
 test -f platform/security/cert-manager/values.yaml
 
-assert_contains clusters/datacenter/platform/postgres-operator.yaml '$values/platform/data/cloudnative-pg/values.yaml'
+assert_contains clusters/datacenter/platform/postgres-operator.yaml 'path: platform/data/cloudnative-pg/operator'
 assert_contains clusters/datacenter/platform/postgres-operator.yaml 'ServerSideApply=true'
-test -f platform/data/cloudnative-pg/values.yaml
-assert_contains platform/data/cloudnative-pg/values.yaml 'INHERITED_ANNOTATIONS: argocd.argoproj.io/sync-wave'
-assert_contains platform/data/cloudnative-pg/values.yaml 'podMonitorEnabled: true'
-assert_contains platform/data/cloudnative-pg/values.yaml 'create: true'
+test -f platform/data/cloudnative-pg/operator/kustomization.yaml
+test -f platform/data/cloudnative-pg/operator/operator-config-patch.yaml
+assert_contains platform/data/cloudnative-pg/operator/kustomization.yaml 'https://raw.githubusercontent.com/cloudnative-pg/cloudnative-pg/release-1.25/releases/cnpg-1.25.4.yaml'
+assert_contains platform/data/cloudnative-pg/operator/kustomization.yaml 'operator-config-patch.yaml'
+assert_contains platform/data/cloudnative-pg/operator/operator-config-patch.yaml 'name: cnpg-controller-manager-config'
+assert_contains platform/data/cloudnative-pg/operator/operator-config-patch.yaml 'INHERITED_ANNOTATIONS: argocd.argoproj.io/sync-wave'
 
 assert_contains clusters/datacenter/platform/kube-prometheus-stack.yaml '$values/platform/observability/kube-prometheus-stack/values.yaml'
 test -f platform/observability/kube-prometheus-stack/values.yaml
