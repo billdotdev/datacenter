@@ -1,7 +1,0 @@
-apiVersion: v1
-kind: ConfigMap
-metadata:
-  name: shared-gateway-bootstrap-placeholder
-  namespace: istio-ingress
-data:
-  placeholder: "true"
