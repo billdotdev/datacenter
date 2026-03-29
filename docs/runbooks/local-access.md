@@ -29,3 +29,10 @@ open https://dashboard.datacenter.lan
 ```
 
 The dashboard `Deployment` expects the image `ghcr.io/billdotdev/datacenter-dashboard:main`. Push `main`, wait for the `Dashboard Image` GitHub Actions workflow to publish the image, then let Argo CD sync the `dashboard` application.
+
+If the GHCR package is private, set `GHCR_USERNAME` and `GHCR_PULL_TOKEN` in `bootstrap/config/datacenter.env`, then apply the pull secret:
+
+```bash
+make dashboard-registry-secret
+kubectl -n dashboard get secret regcred
+```

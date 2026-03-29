@@ -12,6 +12,8 @@ spec:
       labels:
         app.kubernetes.io/name: dashboard
     spec:
+      imagePullSecrets:
+        - name: regcred
       containers:
         - name: dashboard
           image: ghcr.io/billdotdev/datacenter-dashboard:main
