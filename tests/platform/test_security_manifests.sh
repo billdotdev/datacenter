@@ -12,15 +12,18 @@ kubectl kustomize platform/security/internal-tls >/dev/null
 
 grep -q '^controller:$' platform/security/ingress-nginx/values.yaml
 grep -q 'replicaCount: 2' platform/security/ingress-nginx/values.yaml
-grep -q 'serviceMonitor:' platform/security/ingress-nginx/values.yaml
 grep -q 'type: LoadBalancer' platform/security/ingress-nginx/values.yaml
-grep -q 'admissionWebhooks:' platform/security/ingress-nginx/values.yaml
 grep -q '^defaultBackend:$' platform/security/ingress-nginx/values.yaml
+awk '/^  metrics:$/,/^  service:$/ {print}' platform/security/ingress-nginx/values.yaml | grep -q '^    enabled: true$'
+awk '/^    serviceMonitor:$/,/^  service:$/ {print}' platform/security/ingress-nginx/values.yaml | grep -q '^      enabled: true$'
+awk '/^  admissionWebhooks:$/,/^defaultBackend:$/ {print}' platform/security/ingress-nginx/values.yaml | grep -q '^    enabled: true$'
+awk '/^defaultBackend:$/,0 {print}' platform/security/ingress-nginx/values.yaml | grep -q '^  enabled: true$'
 
 grep -q '^crds:$' platform/security/cert-manager/values.yaml
-grep -q 'enabled: true' platform/security/cert-manager/values.yaml
 grep -q '^prometheus:$' platform/security/cert-manager/values.yaml
 grep -q 'timeoutSeconds: 10' platform/security/cert-manager/values.yaml
+awk '/^crds:$/,/^prometheus:$/ {print}' platform/security/cert-manager/values.yaml | grep -q '^  enabled: true$'
+awk '/^prometheus:$/,/^webhook:$/ {print}' platform/security/cert-manager/values.yaml | grep -q '^  enabled: true$'
 
 grep -A3 'issuerRef:' platform/security/internal-tls/root-ca-certificate.yaml | grep -q 'name: datacenter-selfsigned-bootstrap'
 grep -A3 'issuerRef:' platform/security/internal-tls/root-ca-certificate.yaml | grep -q 'kind: ClusterIssuer'
