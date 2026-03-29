@@ -15,3 +15,7 @@ cluster-verify:
 .PHONY: dashboard-registry-secret
 dashboard-registry-secret:
 	bash bootstrap/scripts/dashboard-registry-secret.sh
+
+.PHONY: dashboard-app-secret
+dashboard-app-secret:
+	bash bootstrap/scripts/dashboard-app-secret.sh

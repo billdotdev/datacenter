@@ -18,6 +18,9 @@ spec:
         - name: dashboard
           image: ghcr.io/billdotdev/datacenter-dashboard:main
           imagePullPolicy: Always
+          envFrom:
+            - secretRef:
+                name: dashboard-app-env
           ports:
             - name: http
               containerPort: 3000

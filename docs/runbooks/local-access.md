@@ -36,3 +36,10 @@ If the GHCR package is private, set `GHCR_USERNAME` and `GHCR_PULL_TOKEN` in `bo
 make dashboard-registry-secret
 kubectl -n dashboard get secret regcred
 ```
+
+The auth-enabled dashboard also needs app env in-cluster:
+
+```bash
+make dashboard-app-secret
+kubectl -n dashboard get secret dashboard-app-env
+```
