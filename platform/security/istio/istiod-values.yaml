@@ -1,4 +1,5 @@
-profile: minimal
+global:
+  platform: k3s
 meshConfig:
   accessLogFile: /dev/stdout
 pilot:

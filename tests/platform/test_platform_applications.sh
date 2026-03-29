@@ -110,7 +110,8 @@ assert_contains clusters/datacenter/platform/istio-base.yaml 'targetRevision: 1.
 
 assert_contains clusters/datacenter/platform/istiod.yaml '$values/platform/security/istio/istiod-values.yaml'
 test -f platform/security/istio/istiod-values.yaml
-assert_contains platform/security/istio/istiod-values.yaml 'profile: minimal'
+assert_contains platform/security/istio/istiod-values.yaml 'global:'
+assert_contains platform/security/istio/istiod-values.yaml 'platform: k3s'
 assert_contains platform/security/istio/istiod-values.yaml 'accessLogFile: /dev/stdout'
 assert_contains platform/security/istio/istiod-values.yaml 'replicaCount: 2'
 
@@ -136,6 +137,7 @@ assert_contains clusters/datacenter/platform/cert-manager.yaml '$values/platform
 test -f platform/security/cert-manager/values.yaml
 
 assert_contains clusters/datacenter/platform/postgres-operator.yaml '$values/platform/data/cloudnative-pg/values.yaml'
+assert_contains clusters/datacenter/platform/postgres-operator.yaml 'ServerSideApply=true'
 test -f platform/data/cloudnative-pg/values.yaml
 assert_contains platform/data/cloudnative-pg/values.yaml 'INHERITED_ANNOTATIONS: argocd.argoproj.io/sync-wave'
 assert_contains platform/data/cloudnative-pg/values.yaml 'podMonitorEnabled: true'
@@ -151,6 +153,7 @@ assert_contains clusters/datacenter/platform/promtail.yaml '$values/platform/obs
 test -f platform/observability/promtail/values.yaml
 
 assert_contains clusters/datacenter/platform/chaos-mesh.yaml '$values/platform/chaos/chaos-mesh/values.yaml'
+assert_contains clusters/datacenter/platform/chaos-mesh.yaml 'ServerSideApply=true'
 test -f platform/chaos/chaos-mesh/values.yaml
 
 assert_contains clusters/datacenter/platform/internal-tls.yaml 'path: platform/security/internal-tls'

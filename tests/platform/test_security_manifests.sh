@@ -38,7 +38,8 @@ test -f platform/security/internal-tls/ingress-certificate.yaml
 kubectl kustomize platform/security/gateway-api/shared-gateway >/dev/null
 kubectl kustomize platform/security/internal-tls >/dev/null
 
-assert_contains platform/security/istio/istiod-values.yaml 'profile: minimal'
+assert_contains platform/security/istio/istiod-values.yaml 'global:'
+assert_contains platform/security/istio/istiod-values.yaml 'platform: k3s'
 assert_contains platform/security/istio/istiod-values.yaml 'accessLogFile: /dev/stdout'
 assert_contains platform/security/istio/istiod-values.yaml 'replicaCount: 2'
 
