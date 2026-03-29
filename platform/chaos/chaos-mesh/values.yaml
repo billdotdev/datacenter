@@ -5,5 +5,10 @@ controllerManager:
 chaosDaemon:
   runtime: containerd
   socketPath: /run/k3s/containerd/containerd.sock
+  mtls:
+    enabled: false
 dnsServer:
   create: false
+webhook:
+  certManager:
+    enabled: true

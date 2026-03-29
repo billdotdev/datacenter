@@ -8,6 +8,8 @@
 
 **Tech Stack:** Terraform, Proxmox API, Ansible, Bash, `k3s`, Argo CD, Kustomize, YAML
 
+**Status Note (2026-03-29):** The repo implementation for this plan is present and the current bootstrap, docs, GitOps, and Terraform validation scripts pass. The checkbox list below was not maintained during implementation and should not be treated as the execution source of truth.
+
 ---
 
 ### Task 1: Create The Bootstrap Configuration Layer

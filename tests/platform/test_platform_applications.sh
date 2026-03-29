@@ -168,7 +168,13 @@ test -f platform/observability/promtail/values.yaml
 
 assert_contains clusters/datacenter/platform/chaos-mesh.yaml '$values/platform/chaos/chaos-mesh/values.yaml'
 assert_contains clusters/datacenter/platform/chaos-mesh.yaml 'ServerSideApply=true'
+assert_contains clusters/datacenter/platform/chaos-mesh.yaml 'ignoreDifferences:'
+assert_contains clusters/datacenter/platform/chaos-mesh.yaml '/spec/template/metadata/annotations/rollme'
 test -f platform/chaos/chaos-mesh/values.yaml
+assert_contains platform/chaos/chaos-mesh/values.yaml 'mtls:'
+assert_contains platform/chaos/chaos-mesh/values.yaml 'enabled: false'
+assert_contains platform/chaos/chaos-mesh/values.yaml 'certManager:'
+assert_contains platform/chaos/chaos-mesh/values.yaml 'enabled: true'
 
 assert_contains clusters/datacenter/platform/internal-tls.yaml 'path: platform/security/internal-tls'
 test -f platform/security/internal-tls/kustomization.yaml

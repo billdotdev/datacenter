@@ -29,3 +29,14 @@ make cluster-verify
 kubectl get nodes
 kubectl get applications -n argocd
 ```
+
+## Optional: auto-load kubectl context in this repo
+
+If you use `direnv`, the tracked [`.envrc`](/Users/bill/development/datacenter/.envrc) file auto-loads `bootstrap/config/datacenter.env` and exports `KUBECONFIG="$KUBECONFIG_PATH"` when you enter this repo.
+
+```bash
+brew install direnv
+echo 'eval "$(direnv hook zsh)"' >> ~/.zshrc
+direnv allow
+kubectl get nodes
+```

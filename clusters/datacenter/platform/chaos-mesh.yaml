@@ -17,6 +17,19 @@ spec:
     - repoURL: https://github.com/billdotdev/datacenter.git
       targetRevision: main
       ref: values
+  ignoreDifferences:
+    - group: apps
+      kind: Deployment
+      name: chaos-controller-manager
+      namespace: chaos-mesh
+      jsonPointers:
+        - /spec/template/metadata/annotations/rollme
+    - group: apps
+      kind: DaemonSet
+      name: chaos-daemon
+      namespace: chaos-mesh
+      jsonPointers:
+        - /spec/template/metadata/annotations/rollme
   destination:
     server: https://kubernetes.default.svc
     namespace: chaos-mesh
