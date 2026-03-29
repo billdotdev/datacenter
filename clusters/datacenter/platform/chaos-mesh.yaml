@@ -32,6 +32,21 @@ spec:
       namespace: chaos-mesh
       jsonPointers:
         - /spec/template/metadata/annotations/rollme
+    - group: admissionregistration.k8s.io
+      kind: MutatingWebhookConfiguration
+      name: chaos-mesh-mutation
+      jqPathExpressions:
+        - '.webhooks[]?.clientConfig.caBundle'
+    - group: admissionregistration.k8s.io
+      kind: ValidatingWebhookConfiguration
+      name: chaos-mesh-validation
+      jqPathExpressions:
+        - '.webhooks[]?.clientConfig.caBundle'
+    - group: admissionregistration.k8s.io
+      kind: ValidatingWebhookConfiguration
+      name: chaos-mesh-validation-auth
+      jqPathExpressions:
+        - '.webhooks[]?.clientConfig.caBundle'
   destination:
     server: https://kubernetes.default.svc
     namespace: chaos-mesh

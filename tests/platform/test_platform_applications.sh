@@ -113,8 +113,12 @@ assert_contains clusters/datacenter/platform/gateway-api-crds.yaml 'path: config
 assert_contains clusters/datacenter/platform/istio-base.yaml 'repoURL: https://istio-release.storage.googleapis.com/charts'
 assert_contains clusters/datacenter/platform/istio-base.yaml 'chart: base'
 assert_contains clusters/datacenter/platform/istio-base.yaml 'targetRevision: 1.28.3'
+assert_contains clusters/datacenter/platform/istio-base.yaml 'istiod-default-validator'
+assert_contains clusters/datacenter/platform/istio-base.yaml '.webhooks[]?.clientConfig.caBundle'
 
 assert_contains clusters/datacenter/platform/istiod.yaml '$values/platform/security/istio/istiod-values.yaml'
+assert_contains clusters/datacenter/platform/istiod.yaml 'istio-validator-istio-system'
+assert_contains clusters/datacenter/platform/istiod.yaml '.webhooks[]?.clientConfig.caBundle'
 test -f platform/security/istio/istiod-values.yaml
 assert_contains platform/security/istio/istiod-values.yaml 'global:'
 assert_contains platform/security/istio/istiod-values.yaml 'platform: k3s'
@@ -206,6 +210,10 @@ assert_contains clusters/datacenter/platform/chaos-mesh.yaml 'cert-manager.io/v1
 assert_contains clusters/datacenter/platform/chaos-mesh.yaml 'ServerSideApply=true'
 assert_contains clusters/datacenter/platform/chaos-mesh.yaml 'ignoreDifferences:'
 assert_contains clusters/datacenter/platform/chaos-mesh.yaml '/spec/template/metadata/annotations/rollme'
+assert_contains clusters/datacenter/platform/chaos-mesh.yaml 'chaos-mesh-mutation'
+assert_contains clusters/datacenter/platform/chaos-mesh.yaml 'chaos-mesh-validation'
+assert_contains clusters/datacenter/platform/chaos-mesh.yaml 'chaos-mesh-validation-auth'
+assert_contains clusters/datacenter/platform/chaos-mesh.yaml '.webhooks[]?.clientConfig.caBundle'
 test -f platform/chaos/chaos-mesh/values.yaml
 assert_contains platform/chaos/chaos-mesh/values.yaml 'mtls:'
 assert_contains platform/chaos/chaos-mesh/values.yaml 'enabled: false'
