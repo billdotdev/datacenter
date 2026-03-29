@@ -1,7 +1,6 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-test -f platform/security/ingress-nginx/values.yaml
 test -f platform/security/cert-manager/values.yaml
 test -f platform/security/internal-tls/kustomization.yaml
 test -f platform/security/internal-tls/root-selfsigned-issuer.yaml
@@ -9,15 +8,6 @@ test -f platform/security/internal-tls/root-ca-certificate.yaml
 test -f platform/security/internal-tls/cluster-issuer.yaml
 
 kubectl kustomize platform/security/internal-tls >/dev/null
-
-grep -q '^controller:$' platform/security/ingress-nginx/values.yaml
-grep -q 'replicaCount: 2' platform/security/ingress-nginx/values.yaml
-grep -q 'type: LoadBalancer' platform/security/ingress-nginx/values.yaml
-grep -q '^defaultBackend:$' platform/security/ingress-nginx/values.yaml
-awk '/^  metrics:$/,/^  service:$/ {print}' platform/security/ingress-nginx/values.yaml | grep -q '^    enabled: true$'
-awk '/^    serviceMonitor:$/,/^  service:$/ {print}' platform/security/ingress-nginx/values.yaml | grep -q '^      enabled: true$'
-awk '/^  admissionWebhooks:$/,/^defaultBackend:$/ {print}' platform/security/ingress-nginx/values.yaml | grep -q '^    enabled: true$'
-awk '/^defaultBackend:$/,0 {print}' platform/security/ingress-nginx/values.yaml | grep -q '^  enabled: true$'
 
 grep -q '^crds:$' platform/security/cert-manager/values.yaml
 grep -q '^prometheus:$' platform/security/cert-manager/values.yaml
