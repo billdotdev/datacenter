@@ -28,8 +28,15 @@ test -f clusters/datacenter/platform/kube-prometheus-stack.yaml
 test -f clusters/datacenter/platform/loki.yaml
 test -f clusters/datacenter/platform/promtail.yaml
 test -f clusters/datacenter/platform/chaos-mesh.yaml
+test -f platform/gitops/argocd/bootstrap/argocd-cm-application-health.yaml
 
 assert_contains clusters/datacenter/kustomization.yaml '  - platform'
+assert_contains platform/gitops/argocd/bootstrap/kustomization.yaml 'argocd-cm-application-health.yaml'
+assert_contains platform/gitops/argocd/bootstrap/argocd-cm-application-health.yaml 'kind: ConfigMap'
+assert_contains platform/gitops/argocd/bootstrap/argocd-cm-application-health.yaml 'name: argocd-cm'
+assert_contains platform/gitops/argocd/bootstrap/argocd-cm-application-health.yaml 'resource.customizations: |'
+assert_contains platform/gitops/argocd/bootstrap/argocd-cm-application-health.yaml 'argoproj.io/Application:'
+assert_contains platform/gitops/argocd/bootstrap/argocd-cm-application-health.yaml 'health.lua: |'
 
 assert_contains clusters/datacenter/platform/kustomization.yaml 'gateway-api-crds.yaml'
 assert_contains clusters/datacenter/platform/kustomization.yaml 'istiod.yaml'
