@@ -5,6 +5,7 @@ import { getRequest } from "@tanstack/react-start/server";
 import { db } from "#/db";
 import { user } from "#/db/schema";
 import { auth } from "#/lib/auth";
+import { readClusterSnapshot } from "#/lib/cluster/read-cluster-snapshot";
 import { resolveAuthAccess, type AppRole } from "#/lib/auth-flow";
 
 type AuthPageInput = {
@@ -96,3 +97,18 @@ export const bootstrapAdmin = createServerFn({ method: "POST" })
       ok: true,
     };
   });
+
+export const readDashboardHome = createServerFn({ method: "GET" }).handler(
+  async () => {
+    const snapshot = await getAuthSnapshot(getRequest());
+
+    if (!snapshot.session) {
+      throw new Error("Unauthenticated");
+    }
+
+    return {
+      cluster: await readClusterSnapshot(),
+      session: snapshot.session,
+    };
+  },
+);

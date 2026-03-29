@@ -12,6 +12,7 @@ spec:
       labels:
         app.kubernetes.io/name: dashboard
     spec:
+      serviceAccountName: dashboard
       imagePullSecrets:
         - name: regcred
       containers:

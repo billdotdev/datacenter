@@ -3,6 +3,9 @@ kind: Kustomization
 namespace: dashboard
 resources:
   - namespace.yaml
+  - serviceaccount.yaml
+  - clusterrole.yaml
+  - clusterrolebinding.yaml
   - deployment.yaml
   - service.yaml
   - httproute.yaml

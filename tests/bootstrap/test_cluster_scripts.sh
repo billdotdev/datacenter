@@ -23,3 +23,7 @@ grep -q 'GHCR_USERNAME' bootstrap/scripts/dashboard-registry-secret.sh
 grep -q 'GHCR_PULL_TOKEN' bootstrap/scripts/dashboard-registry-secret.sh
 grep -q 'kubectl create namespace dashboard' bootstrap/scripts/dashboard-registry-secret.sh
 grep -q 'kubectl create secret docker-registry regcred' bootstrap/scripts/dashboard-registry-secret.sh
+grep -q 'serviceAccountName: dashboard' apps/dashboard/k8s/deployment.yaml
+grep -q 'argoproj.io' apps/dashboard/k8s/clusterrole.yaml
+grep -q 'applications' apps/dashboard/k8s/clusterrole.yaml
+grep -q 'nodes' apps/dashboard/k8s/clusterrole.yaml

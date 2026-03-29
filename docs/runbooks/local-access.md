@@ -43,3 +43,19 @@ The auth-enabled dashboard also needs app env in-cluster:
 make dashboard-app-secret
 kubectl -n dashboard get secret dashboard-app-env
 ```
+
+## Dashboard Cluster Reads
+
+After syncing the latest image, verify:
+
+```bash
+kubectl -n dashboard rollout status deployment/dashboard
+curl -ksS --resolve dashboard.datacenter.lan:443:10.100.0.240 https://dashboard.datacenter.lan/health
+```
+
+Open `https://dashboard.datacenter.lan/` and confirm:
+
+- node counts are populated
+- node list renders
+- Argo applications render
+- refresh updates without a full page reload

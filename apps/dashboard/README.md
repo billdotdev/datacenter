@@ -26,10 +26,29 @@ pnpm dlx @better-auth/cli@latest secret
 
 The app mounts Better Auth at `/api/auth/*` and stores a `role` field on the Better Auth `user` row. First bootstrap user is promoted to `admin`; later users default to `viewer`.
 
+## Phase 3 Read APIs
+
+The homepage now reads cluster state through the app backend using
+`@kubernetes/client-node`.
+
+Current live slice:
+
+- cluster summary
+- node list
+- Argo CD application list
+
+Refresh behavior:
+
+- initial SSR load
+- client polling every 20 seconds
+
 ## Build and test
 
 ```bash
 pnpm test -- src/lib/auth-flow.test.ts
+pnpm test -- src/lib/cluster/derive-cluster-snapshot.test.ts
+pnpm test -- src/lib/cluster/read-cluster-snapshot.test.ts
+pnpm test -- src/components/cluster-overview.test.tsx
 pnpm build
 ```
 
