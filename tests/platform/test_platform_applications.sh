@@ -169,6 +169,8 @@ test -f platform/observability/promtail/values.yaml
 
 assert_contains clusters/datacenter/platform/chaos-mesh.yaml '$values/platform/chaos/chaos-mesh/values.yaml'
 assert_contains clusters/datacenter/platform/chaos-mesh.yaml 'targetRevision: 2.7.3'
+assert_contains clusters/datacenter/platform/chaos-mesh.yaml 'cert-manager.io/v1/Certificate'
+assert_contains clusters/datacenter/platform/chaos-mesh.yaml 'cert-manager.io/v1/Issuer'
 assert_contains clusters/datacenter/platform/chaos-mesh.yaml 'ServerSideApply=true'
 assert_contains clusters/datacenter/platform/chaos-mesh.yaml 'ignoreDifferences:'
 assert_contains clusters/datacenter/platform/chaos-mesh.yaml '/spec/template/metadata/annotations/rollme'
