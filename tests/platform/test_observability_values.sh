@@ -16,6 +16,7 @@ assert_contains platform/observability/kube-prometheus-stack/values.yaml 'grafan
 assert_contains platform/observability/kube-prometheus-stack/values.yaml 'retention: 7d'
 assert_contains platform/observability/kube-prometheus-stack/values.yaml 'storageClassName: local-path'
 assert_contains platform/observability/kube-prometheus-stack/values.yaml 'adminPassword: changeme-before-prod'
+assert_contains platform/observability/loki/values.yaml 'useTestSchema: true'
 assert_contains platform/observability/loki/values.yaml 'retention_period: 168h'
 assert_contains platform/observability/loki/values.yaml 'replication_factor: 1'
 assert_contains platform/observability/loki/values.yaml 'deploymentMode: SingleBinary'

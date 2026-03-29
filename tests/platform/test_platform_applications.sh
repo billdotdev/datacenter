@@ -149,10 +149,12 @@ assert_contains platform/data/cloudnative-pg/operator/operator-config-patch.yaml
 assert_contains platform/data/cloudnative-pg/operator/operator-config-patch.yaml 'INHERITED_ANNOTATIONS: argocd.argoproj.io/sync-wave'
 
 assert_contains clusters/datacenter/platform/kube-prometheus-stack.yaml '$values/platform/observability/kube-prometheus-stack/values.yaml'
+assert_contains clusters/datacenter/platform/kube-prometheus-stack.yaml 'ServerSideApply=true'
 test -f platform/observability/kube-prometheus-stack/values.yaml
 
 assert_contains clusters/datacenter/platform/loki.yaml '$values/platform/observability/loki/values.yaml'
 test -f platform/observability/loki/values.yaml
+assert_contains platform/observability/loki/values.yaml 'useTestSchema: true'
 
 assert_contains clusters/datacenter/platform/promtail.yaml '$values/platform/observability/promtail/values.yaml'
 test -f platform/observability/promtail/values.yaml
