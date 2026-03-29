@@ -15,9 +15,10 @@ test -f platform/data/postgres/cluster.yaml
 test -f platform/data/postgres/backup-schedule.yaml
 
 assert_contains platform/data/cloudnative-pg/operator/kustomization.yaml 'https://raw.githubusercontent.com/cloudnative-pg/cloudnative-pg/release-1.25/releases/cnpg-1.25.4.yaml'
+assert_contains platform/data/cloudnative-pg/operator/kustomization.yaml 'namespace: database'
 assert_contains platform/data/cloudnative-pg/operator/kustomization.yaml 'operator-config-patch.yaml'
 assert_contains platform/data/cloudnative-pg/operator/operator-config-patch.yaml 'name: cnpg-controller-manager-config'
-assert_contains platform/data/cloudnative-pg/operator/operator-config-patch.yaml 'namespace: cnpg-system'
+assert_contains platform/data/cloudnative-pg/operator/operator-config-patch.yaml 'namespace: database'
 assert_contains platform/data/cloudnative-pg/operator/operator-config-patch.yaml 'INHERITED_ANNOTATIONS: argocd.argoproj.io/sync-wave'
 
 assert_contains platform/data/postgres/kustomization.yaml 'cluster.yaml'

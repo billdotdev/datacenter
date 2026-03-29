@@ -13,7 +13,7 @@ spec:
     path: platform/data/cloudnative-pg/operator
   destination:
     server: https://kubernetes.default.svc
-    namespace: cnpg-system
+    namespace: database
   syncPolicy:
     automated:
       prune: true
