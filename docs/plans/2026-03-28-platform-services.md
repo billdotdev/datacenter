@@ -8,6 +8,8 @@
 
 **Tech Stack:** Argo CD, Kubernetes Gateway API, Istio (`base`, `istiod`), Helm charts through Argo CD, Kustomize, cert-manager, CloudNativePG, kube-prometheus-stack, Loki, Promtail, Chaos Mesh, YAML, Bash
 
+**Status Note (2026-03-29):** The repo implementation for this plan is present and the platform layer is live in the current cluster. Remaining work is narrow operational cleanup, such as sync-noise reduction and stronger verification gates. The checkbox list below was not maintained during implementation and should not be treated as the execution source of truth.
+
 ---
 
 ### Task 1: Add Cluster Composition For Gateway API And Platform Applications

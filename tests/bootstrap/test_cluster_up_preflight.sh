@@ -42,6 +42,8 @@ CP2_IP=10.100.0.112
 CP3_IP=10.100.0.113
 SSH_USER=ubuntu
 SSH_PRIVATE_KEY_PATH=$private_key
+GITHUB_REPO_USERNAME=billdotdev
+GITHUB_FINE_GRAINED_PAT=github_pat_example
 EOF
 
 cat <<'EOF' >"${private_key}.pub"

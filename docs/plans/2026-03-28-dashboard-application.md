@@ -2,13 +2,13 @@
 
 **Goal:** Define the recommended sequence for the custom dashboard after the platform layer exists.
 
-**Dependency Rule:** Do not start full application implementation until Plan 2 has landed enough primitives to provide ingress, internal TLS, PostgreSQL, and observability endpoints.
+**Dependency Rule:** Use the current live Plan 2 platform baseline as the dependency floor for application work: ingress, internal TLS, PostgreSQL, and observability are present, but operator cleanup should stay ahead of deeper application phases.
 
 ## Status
 
 - Plan 1: bootstrap and GitOps foundation exist in repo
-- Plan 2: next executable implementation target
-- Plan 3: roadmap only for now; convert into a full implementation plan after Plan 2 choices settle
+- Plan 2: implemented in repo and live in the current cluster
+- Plan 3: next executable implementation target; convert this roadmap into a full implementation plan
 
 ## Scope
 
@@ -73,7 +73,7 @@
 
 ## Acceptance Gates Before Full Plan
 
-Convert this roadmap into a full implementation plan only after these choices are locked:
+Convert this roadmap into a full implementation plan after these choices are confirmed against the live cluster:
 
 - which internal hostname scheme Plan 2 uses
 - how PostgreSQL credentials are provisioned into workloads
@@ -87,4 +87,3 @@ Convert this roadmap into a full implementation plan only after these choices ar
 - full implementation plan with file-by-file tasks
 - local access instructions for dashboard and Grafana embed flow
 - drill catalog and operator runbook
-

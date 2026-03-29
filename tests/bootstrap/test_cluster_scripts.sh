@@ -13,3 +13,7 @@ grep -q 'kubectl apply --server-side --force-conflicts -k platform/gitops/argocd
 grep -q 'argocd.argoproj.io/secret-type: repository' bootstrap/scripts/cluster-up.sh
 grep -q 'https://github.com/billdotdev/datacenter.git' bootstrap/scripts/cluster-up.sh
 grep -q 'GITHUB_FINE_GRAINED_PAT' bootstrap/scripts/cluster-up.sh
+grep -q 'gateway.gateway.networking.k8s.io/shared-gateway' bootstrap/scripts/cluster-verify.sh
+grep -q 'certificate.cert-manager.io/datacenter-ingress-tls' bootstrap/scripts/cluster-verify.sh
+grep -q 'cluster.postgresql.cnpg.io/datacenter-postgres' bootstrap/scripts/cluster-verify.sh
+grep -q 'jsonpath=' bootstrap/scripts/cluster-verify.sh

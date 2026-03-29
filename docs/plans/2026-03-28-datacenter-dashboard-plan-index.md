@@ -4,9 +4,9 @@ This project is split into three plans so infrastructure, platform services, and
 
 Current status:
 
-- Plan 1 implementation exists in repo and current validation scripts pass
-- Plan 2 is the next executable implementation target
-- Plan 3 is scoped as a roadmap and should become a detailed implementation plan after Plan 2 lands
+- Plan 1 implementation exists in repo and the cluster is live
+- Plan 2 implementation exists in repo and is live in the current cluster, with minor operational cleanup remaining
+- Plan 3 is now the next executable implementation target and should become a detailed implementation plan
 
 ## Plan 1
 
@@ -40,8 +40,9 @@ Scope:
 
 Status:
 
-- newly defined
-- next plan to execute
+- implemented in repo
+- live in the current cluster
+- remaining work is operational cleanup, not first-pass implementation
 
 ## Plan 3
 
@@ -59,5 +60,5 @@ Scope:
 
 Status:
 
-- roadmap only for now
-- convert into a full implementation plan after Plan 2 decisions settle
+- next executable implementation target
+- convert this roadmap into a full implementation plan against the live platform baseline
