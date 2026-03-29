@@ -4,3 +4,4 @@ resources:
   - root-selfsigned-issuer.yaml
   - root-ca-certificate.yaml
   - cluster-issuer.yaml
+  - ingress-certificate.yaml

@@ -1,0 +1,14 @@
+apiVersion: cert-manager.io/v1
+kind: Certificate
+metadata:
+  name: datacenter-ingress-tls
+  namespace: istio-ingress
+spec:
+  secretName: datacenter-ingress-tls
+  commonName: ingress.datacenter.lan
+  dnsNames:
+    - ingress.datacenter.lan
+    - "*.datacenter.lan"
+  issuerRef:
+    name: datacenter-ca
+    kind: ClusterIssuer
