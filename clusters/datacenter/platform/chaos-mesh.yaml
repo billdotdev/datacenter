@@ -13,8 +13,7 @@ spec:
       targetRevision: 2.7.3
       helm:
         apiVersions:
-          - cert-manager.io/v1/Certificate
-          - cert-manager.io/v1/Issuer
+          - cert-manager.io/v1
         valueFiles:
           - $values/platform/chaos/chaos-mesh/values.yaml
     - repoURL: https://github.com/billdotdev/datacenter.git
