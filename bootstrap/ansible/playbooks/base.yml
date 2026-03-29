@@ -1,6 +1,14 @@
 - name: Prepare all cluster nodes
   hosts: control_plane
   become: true
+  gather_facts: false
+  pre_tasks:
+    - name: Wait for SSH to become reachable
+      ansible.builtin.wait_for_connection:
+        timeout: 300
+
+    - name: Gather facts
+      ansible.builtin.setup:
   tasks:
     - name: Disable swap immediately
       ansible.builtin.command: swapoff -a

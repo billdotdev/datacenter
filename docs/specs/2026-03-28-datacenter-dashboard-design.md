@@ -23,11 +23,11 @@ Use `k3s` for the first version, with the repo structured so the cluster can lat
 
 ### Physical Layout
 
-- Host A: `pve-1` on laptop 1 at `10.100.1.100`
-- Host B: `pve-2` on laptop 2 at `10.100.1.101`
-- Node `cp-1` (`cp` = control plane): Ubuntu Server 24.04 LTS VM on `pve-1` at `10.100.1.111`
-- Node `cp-2`: Ubuntu Server 24.04 LTS VM on `pve-1` at `10.100.1.112`
-- Node `cp-3`: Ubuntu Server 24.04 LTS VM on `pve-2` at `10.100.1.113`
+- Host A: `pve-1` on laptop 1 at `10.100.0.100`
+- Host B: `pve-2` on laptop 2 at `10.100.0.101`
+- Node `cp-1` (`cp` = control plane): Ubuntu Server 24.04 LTS VM on `pve-1` at `10.100.0.111`
+- Node `cp-2`: Ubuntu Server 24.04 LTS VM on `pve-1` at `10.100.0.112`
+- Node `cp-3`: Ubuntu Server 24.04 LTS VM on `pve-2` at `10.100.0.113`
 
 All three Kubernetes nodes are both control-plane and worker nodes.
 

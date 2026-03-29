@@ -50,90 +50,90 @@ side_effect_marker="$(mktemp)"
 trap 'rm -f "$missing_kube_env" "$valid_home_env" "$command_substitution_env" "$invalid_line_env" "$invalid_name_env" "$missing_output" "$passing_output" "$command_substitution_output" "$invalid_line_output" "$invalid_name_output" "$side_effect_marker"' EXIT
 
 cat <<'EOF' >"$missing_kube_env"
-PVE1_API_URL=https://10.100.1.100:8006/api2/json
+PVE1_API_URL=https://10.100.0.100:8006/api2/json
 PVE1_API_TOKEN_ID=terraform@pve!codex
 PVE1_API_TOKEN_SECRET=codex-datacenter-token
 PVE1_NODE=pve-1
-PVE1_STORAGE=local-lvm
+PVE1_STORAGE=local-zfs
 PVE1_BRIDGE=vmbr0
 PVE1_TEMPLATE_VM_ID=9000
-PVE2_API_URL=https://10.100.1.101:8006/api2/json
+PVE2_API_URL=https://10.100.0.101:8006/api2/json
 PVE2_API_TOKEN_ID=terraform@pve!codex
 PVE2_API_TOKEN_SECRET=codex-datacenter-token
 PVE2_NODE=pve-2
-PVE2_STORAGE=local-lvm
+PVE2_STORAGE=local-zfs
 PVE2_BRIDGE=vmbr0
 PVE2_TEMPLATE_VM_ID=9000
 CLUSTER_NAME=datacenter
 K3S_INSTALL_CHANNEL=stable
 K3S_CLUSTER_TOKEN=datacenter-lab-bootstrap-token
-CP1_IP=10.100.1.111
-CP2_IP=10.100.1.112
-CP3_IP=10.100.1.113
+CP1_IP=10.100.0.111
+CP2_IP=10.100.0.112
+CP3_IP=10.100.0.113
 SSH_USER=ubuntu
 SSH_PRIVATE_KEY_PATH=/tmp/id_ed25519
 EOF
 
 cat <<'EOF' >"$valid_home_env"
-PVE1_API_URL=https://10.100.1.100:8006/api2/json
+PVE1_API_URL=https://10.100.0.100:8006/api2/json
 PVE1_API_TOKEN_ID=terraform@pve!codex
 PVE1_API_TOKEN_SECRET=codex-datacenter-token
 PVE1_NODE=pve-1
-PVE1_STORAGE=local-lvm
+PVE1_STORAGE=local-zfs
 PVE1_BRIDGE=vmbr0
 PVE1_TEMPLATE_VM_ID=9000
-PVE2_API_URL=https://10.100.1.101:8006/api2/json
+PVE2_API_URL=https://10.100.0.101:8006/api2/json
 PVE2_API_TOKEN_ID=terraform@pve!codex
 PVE2_API_TOKEN_SECRET=codex-datacenter-token
 PVE2_NODE=pve-2
-PVE2_STORAGE=local-lvm
+PVE2_STORAGE=local-zfs
 PVE2_BRIDGE=vmbr0
 PVE2_TEMPLATE_VM_ID=9000
 CLUSTER_NAME=datacenter
 K3S_INSTALL_CHANNEL=stable
 K3S_CLUSTER_TOKEN=datacenter-lab-bootstrap-token
 KUBECONFIG_PATH=$HOME/.kube/datacenter.kubeconfig
-CP1_IP=10.100.1.111
-CP2_IP=10.100.1.112
-CP3_IP=10.100.1.113
+CP1_IP=10.100.0.111
+CP2_IP=10.100.0.112
+CP3_IP=10.100.0.113
 SSH_USER=ubuntu
 SSH_PRIVATE_KEY_PATH=$HOME/.ssh/id_ed25519
 EOF
 
 cat <<EOF >"$command_substitution_env"
-PVE1_API_URL=https://10.100.1.100:8006/api2/json
+PVE1_API_URL=https://10.100.0.100:8006/api2/json
 PVE1_API_TOKEN_ID=terraform@pve!codex
 PVE1_API_TOKEN_SECRET=codex-datacenter-token
 PVE1_NODE=pve-1
-PVE1_STORAGE=local-lvm
+PVE1_STORAGE=local-zfs
 PVE1_BRIDGE=vmbr0
 PVE1_TEMPLATE_VM_ID=9000
-PVE2_API_URL=https://10.100.1.101:8006/api2/json
+PVE2_API_URL=https://10.100.0.101:8006/api2/json
 PVE2_API_TOKEN_ID=terraform@pve!codex
 PVE2_API_TOKEN_SECRET=codex-datacenter-token
 PVE2_NODE=pve-2
-PVE2_STORAGE=local-lvm
+PVE2_STORAGE=local-zfs
 PVE2_BRIDGE=vmbr0
 PVE2_TEMPLATE_VM_ID=9000
 CLUSTER_NAME=datacenter
 K3S_INSTALL_CHANNEL=stable
 K3S_CLUSTER_TOKEN=datacenter-lab-bootstrap-token
 KUBECONFIG_PATH=/tmp/datacenter.kubeconfig
-CP1_IP=10.100.1.111
-CP2_IP=10.100.1.112
-CP3_IP=10.100.1.113
+CP1_IP=10.100.0.111
+CP2_IP=10.100.0.112
+CP3_IP=10.100.0.113
 SSH_USER=ubuntu
 SSH_PRIVATE_KEY_PATH=/tmp/id_ed25519
 UNRELATED=\$(touch "$side_effect_marker")literal-value
 EOF
 
 cat <<'EOF' >"$invalid_line_env"
-PVE1_API_URL=https://10.100.1.100:8006/api2/json
+PVE1_API_URL=https://10.100.0.100:8006/api2/json
 NOT_A_VALID_LINE
 EOF
 
 cat <<'EOF' >"$invalid_name_env"
-PVE1_API_URL=https://10.100.1.100:8006/api2/json
+PVE1_API_URL=https://10.100.0.100:8006/api2/json
 INVALID-NAME=value
 EOF
 

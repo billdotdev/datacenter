@@ -13,6 +13,7 @@
 ### Task 1: Create The Bootstrap Configuration Layer
 
 **Files:**
+
 - Create: `Makefile`
 - Create: `bootstrap/config/datacenter.example.env`
 - Create: `bootstrap/scripts/validate-env.sh`
@@ -59,19 +60,19 @@ cluster-verify:
 ```
 
 ```bash
-PVE1_API_URL=https://10.100.1.100:8006/api2/json
+PVE1_API_URL=https://10.100.0.100:8006/api2/json
 PVE1_API_TOKEN_ID=terraform@pve!codex
 PVE1_API_TOKEN_SECRET=codex-datacenter-token
 PVE1_NODE=pve-1
-PVE1_STORAGE=local-lvm
+PVE1_STORAGE=local-zfs
 PVE1_BRIDGE=vmbr0
 PVE1_TEMPLATE_VM_ID=9000
 
-PVE2_API_URL=https://10.100.1.101:8006/api2/json
+PVE2_API_URL=https://10.100.0.101:8006/api2/json
 PVE2_API_TOKEN_ID=terraform@pve!codex
 PVE2_API_TOKEN_SECRET=codex-datacenter-token
 PVE2_NODE=pve-2
-PVE2_STORAGE=local-lvm
+PVE2_STORAGE=local-zfs
 PVE2_BRIDGE=vmbr0
 PVE2_TEMPLATE_VM_ID=9000
 
@@ -80,9 +81,9 @@ K3S_INSTALL_CHANNEL=stable
 K3S_CLUSTER_TOKEN=datacenter-lab-bootstrap-token
 KUBECONFIG_PATH=$HOME/.kube/datacenter.yaml
 
-CP1_IP=10.100.1.111
-CP2_IP=10.100.1.112
-CP3_IP=10.100.1.113
+CP1_IP=10.100.0.111
+CP2_IP=10.100.0.112
+CP3_IP=10.100.0.113
 SSH_USER=ubuntu
 SSH_PRIVATE_KEY_PATH=$HOME/.ssh/id_ed25519
 ```
@@ -191,6 +192,7 @@ git commit -m "chore: add bootstrap configuration validation"
 ### Task 2: Add Terraform For The Multi-Host Proxmox Control-Plane VMs
 
 **Files:**
+
 - Create: `infra/proxmox/providers.tf`
 - Create: `infra/proxmox/variables.tf`
 - Create: `infra/proxmox/main.tf`
@@ -322,7 +324,7 @@ resource "proxmox_virtual_environment_vm" "control_plane_pve1" {
     ip_config {
       ipv4 {
         address = "${each.value.ip}/24"
-        gateway = "10.100.1.1"
+        gateway = "10.100.0.1"
       }
     }
 
@@ -374,7 +376,7 @@ resource "proxmox_virtual_environment_vm" "control_plane_pve2" {
     ip_config {
       ipv4 {
         address = "${each.value.ip}/24"
-        gateway = "10.100.1.1"
+        gateway = "10.100.0.1"
       }
     }
 
@@ -405,19 +407,19 @@ output "control_plane_ips" {
 ```
 
 ```hcl
-pve1_api_url          = "https://10.100.1.100:8006/api2/json"
+pve1_api_url          = "https://10.100.0.100:8006/api2/json"
 pve1_api_token_id     = "terraform@pve!codex"
 pve1_api_token_secret = "codex-datacenter-token"
 pve1_node             = "pve-1"
-pve1_storage          = "local-lvm"
+pve1_storage          = "local-zfs"
 pve1_bridge           = "vmbr0"
 pve1_template_vm_id   = 9000
 
-pve2_api_url          = "https://10.100.1.101:8006/api2/json"
+pve2_api_url          = "https://10.100.0.101:8006/api2/json"
 pve2_api_token_id     = "terraform@pve!codex"
 pve2_api_token_secret = "codex-datacenter-token"
 pve2_node             = "pve-2"
-pve2_storage          = "local-lvm"
+pve2_storage          = "local-zfs"
 pve2_bridge           = "vmbr0"
 pve2_template_vm_id   = 9000
 
@@ -426,7 +428,7 @@ ssh_public_key = "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIBootstrapDatacenterKey co
 control_plane_vms = {
   cp-1 = {
     vm_id        = 201
-    ip           = "10.100.1.111"
+    ip           = "10.100.0.111"
     cores        = 2
     memory       = 4096
     disk_gb      = 40
@@ -434,7 +436,7 @@ control_plane_vms = {
   }
   cp-2 = {
     vm_id        = 202
-    ip           = "10.100.1.112"
+    ip           = "10.100.0.112"
     cores        = 2
     memory       = 4096
     disk_gb      = 40
@@ -442,7 +444,7 @@ control_plane_vms = {
   }
   cp-3 = {
     vm_id        = 301
-    ip           = "10.100.1.113"
+    ip           = "10.100.0.113"
     cores        = 2
     memory       = 4096
     disk_gb      = 40
@@ -466,6 +468,7 @@ git commit -m "feat: add proxmox vm provisioning"
 ### Task 3: Add Ansible For Base Host Setup And k3s Installation
 
 **Files:**
+
 - Create: `bootstrap/ansible/ansible.cfg`
 - Create: `bootstrap/ansible/inventory/datacenter.yml`
 - Create: `bootstrap/ansible/group_vars/all.yml`
@@ -505,16 +508,16 @@ all:
     ansible_user: ubuntu
     ansible_ssh_private_key_file: "{{ lookup('env', 'SSH_PRIVATE_KEY_PATH') }}"
     k3s_token: "{{ lookup('env', 'K3S_CLUSTER_TOKEN') }}"
-    k3s_server_url: "https://10.100.1.111:6443"
+    k3s_server_url: "https://10.100.0.111:6443"
   children:
     control_plane:
       hosts:
         cp-1:
-          ansible_host: 10.100.1.111
+          ansible_host: 10.100.0.111
         cp-2:
-          ansible_host: 10.100.1.112
+          ansible_host: 10.100.0.112
         cp-3:
-          ansible_host: 10.100.1.113
+          ansible_host: 10.100.0.113
 ```
 
 ```yaml
@@ -597,6 +600,7 @@ git commit -m "feat: add ansible bootstrap for k3s nodes"
 ### Task 4: Add Argo CD Bootstrap Manifests
 
 **Files:**
+
 - Create: `platform/gitops/argocd/bootstrap/namespace.yaml`
 - Create: `platform/gitops/argocd/bootstrap/kustomization.yaml`
 - Create: `platform/gitops/argocd/root-project.yaml`
@@ -645,13 +649,13 @@ metadata:
   namespace: argocd
 spec:
   sourceRepos:
-    - '*'
+    - "*"
   destinations:
-    - namespace: '*'
+    - namespace: "*"
       server: https://kubernetes.default.svc
   clusterResourceWhitelist:
-    - group: '*'
-      kind: '*'
+    - group: "*"
+      kind: "*"
 ```
 
 ```yaml
@@ -700,6 +704,7 @@ git commit -m "feat: add argocd bootstrap manifests"
 ### Task 5: Add The One-Command Bring-Up And Verification Flow
 
 **Files:**
+
 - Create: `bootstrap/scripts/cluster-up.sh`
 - Create: `bootstrap/scripts/cluster-verify.sh`
 - Modify: `Makefile`
@@ -737,7 +742,7 @@ source "$ENV_FILE"
 set +a
 
 terraform -chdir=infra/proxmox init
-terraform -chdir=infra/proxmox apply -auto-approve -parallelism=1 \
+terraform -chdir=infra/proxmox apply -auto-approve \
   -var="pve1_api_url=$PVE1_API_URL" \
   -var="pve1_api_token_id=$PVE1_API_TOKEN_ID" \
   -var="pve1_api_token_secret=$PVE1_API_TOKEN_SECRET" \
@@ -814,6 +819,7 @@ git commit -m "feat: add cluster bring-up orchestration"
 ### Task 6: Add The Bootstrap Runbook
 
 **Files:**
+
 - Create: `docs/runbooks/cluster-bootstrap.md`
 - Test: `tests/docs/test_cluster_bootstrap_doc.sh`
 
@@ -836,32 +842,34 @@ Expected: FAIL because the bootstrap runbook does not exist yet.
 
 - [ ] **Step 3: Write minimal implementation**
 
-```markdown
+````markdown
 # Cluster Bootstrap
 
 ## Prepared hosts
 
-- Proxmox is installed on `pve-1` and reachable at `10.100.1.100`
-- Proxmox is installed on `pve-2` and reachable at `10.100.1.101`
+- Proxmox is installed on `pve-1` and reachable at `10.100.0.100`
+- Proxmox is installed on `pve-2` and reachable at `10.100.0.101`
 - an Ubuntu cloud-init template exists on both Proxmox hosts
 - `bootstrap/config/datacenter.env` exists
 
 ## Bring the cluster up
 
-~~~bash
+```bash
 cp bootstrap/config/datacenter.example.env bootstrap/config/datacenter.env
 make bootstrap-validate
 make cluster-up
-~~~
+```
+````
 
 ## Verify the cluster
 
-~~~bash
+```bash
 make cluster-verify
 kubectl get nodes
 kubectl get applications -n argocd
-~~~
 ```
+
+````
 
 - [ ] **Step 4: Run test to verify it passes**
 
@@ -873,4 +881,4 @@ Expected: PASS with no output.
 ```bash
 git add docs/runbooks/cluster-bootstrap.md tests/docs/test_cluster_bootstrap_doc.sh
 git commit -m "docs: add cluster bootstrap runbook"
-```
+````

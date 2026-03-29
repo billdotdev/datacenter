@@ -10,6 +10,11 @@ grep -q 'provider  = proxmox.pve2' infra/proxmox/main.tf
 grep -q 'pve1_api_url' infra/proxmox/variables.tf
 grep -q 'pve2_api_url' infra/proxmox/variables.tf
 grep -q 'proxmox_host = "pve2"' infra/proxmox/terraform.tfvars.example
+grep -q 'interface    = "scsi0"' infra/proxmox/main.tf
+if grep -q 'interface    = "virtio0"' infra/proxmox/main.tf; then
+  echo 'root disk must stay on scsi0 so cloned cloud image storage is actually resized' >&2
+  exit 1
+fi
 
 if ! grep -q 'for name, vm in var.control_plane_vms' infra/proxmox/outputs.tf; then
   echo "outputs.tf must derive control_plane_ips from var.control_plane_vms" >&2

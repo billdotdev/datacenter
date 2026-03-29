@@ -39,7 +39,7 @@ resource "proxmox_virtual_environment_vm" "control_plane_pve1" {
     ip_config {
       ipv4 {
         address = "${each.value.ip}/24"
-        gateway = "10.100.1.1"
+        gateway = "10.100.0.1"
       }
     }
 
@@ -55,7 +55,7 @@ resource "proxmox_virtual_environment_vm" "control_plane_pve1" {
 
   disk {
     datastore_id = var.pve1_storage
-    interface    = "virtio0"
+    interface    = "scsi0"
     size         = each.value.disk_gb
   }
 }
@@ -91,7 +91,7 @@ resource "proxmox_virtual_environment_vm" "control_plane_pve2" {
     ip_config {
       ipv4 {
         address = "${each.value.ip}/24"
-        gateway = "10.100.1.1"
+        gateway = "10.100.0.1"
       }
     }
 
@@ -107,7 +107,7 @@ resource "proxmox_virtual_environment_vm" "control_plane_pve2" {
 
   disk {
     datastore_id = var.pve2_storage
-    interface    = "virtio0"
+    interface    = "scsi0"
     size         = each.value.disk_gb
   }
 }
