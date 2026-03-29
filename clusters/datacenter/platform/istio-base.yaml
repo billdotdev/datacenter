@@ -1,19 +1,19 @@
 apiVersion: argoproj.io/v1alpha1
 kind: Application
 metadata:
-  name: internal-tls
+  name: istio-base
   namespace: argocd
   annotations:
-    argocd.argoproj.io/sync-wave: "2"
+    argocd.argoproj.io/sync-wave: "0"
 spec:
   project: datacenter
   source:
-    repoURL: https://github.com/billdotdev/datacenter.git
-    targetRevision: main
-    path: platform/security/internal-tls
+    repoURL: https://istio-release.storage.googleapis.com/charts
+    chart: base
+    targetRevision: 1.28.3
   destination:
     server: https://kubernetes.default.svc
-    namespace: cert-manager
+    namespace: istio-system
   syncPolicy:
     automated:
       prune: true

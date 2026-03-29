@@ -1,19 +1,19 @@
 apiVersion: argoproj.io/v1alpha1
 kind: Application
 metadata:
-  name: internal-tls
+  name: gateway-shared
   namespace: argocd
   annotations:
-    argocd.argoproj.io/sync-wave: "2"
+    argocd.argoproj.io/sync-wave: "3"
 spec:
   project: datacenter
   source:
     repoURL: https://github.com/billdotdev/datacenter.git
     targetRevision: main
-    path: platform/security/internal-tls
+    path: platform/security/gateway-api/shared-gateway
   destination:
     server: https://kubernetes.default.svc
-    namespace: cert-manager
+    namespace: istio-ingress
   syncPolicy:
     automated:
       prune: true
