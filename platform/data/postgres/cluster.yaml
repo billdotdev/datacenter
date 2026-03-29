@@ -1,0 +1,25 @@
+apiVersion: postgresql.cnpg.io/v1
+kind: Cluster
+metadata:
+  name: datacenter-postgres
+  namespace: database
+spec:
+  instances: 3
+  storage:
+    size: 20Gi
+    storageClass: local-path
+  monitoring:
+    enablePodMonitor: true
+  bootstrap:
+    initdb:
+      database: datacenter
+      owner: datacenter
+  managed:
+    roles:
+      - name: datacenter
+        login: true
+        superuser: false
+  postgresql:
+    parameters:
+      max_connections: "200"
+      shared_buffers: "256MB"

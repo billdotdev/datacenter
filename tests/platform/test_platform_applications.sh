@@ -137,6 +137,9 @@ test -f platform/security/cert-manager/values.yaml
 
 assert_contains clusters/datacenter/platform/postgres-operator.yaml '$values/platform/data/cloudnative-pg/values.yaml'
 test -f platform/data/cloudnative-pg/values.yaml
+assert_contains platform/data/cloudnative-pg/values.yaml 'INHERITED_ANNOTATIONS: argocd.argoproj.io/sync-wave'
+assert_contains platform/data/cloudnative-pg/values.yaml 'podMonitorEnabled: true'
+assert_contains platform/data/cloudnative-pg/values.yaml 'create: true'
 
 assert_contains clusters/datacenter/platform/kube-prometheus-stack.yaml '$values/platform/observability/kube-prometheus-stack/values.yaml'
 test -f platform/observability/kube-prometheus-stack/values.yaml
@@ -163,6 +166,17 @@ assert_contains platform/security/internal-tls/ingress-certificate.yaml 'secretN
 
 assert_contains clusters/datacenter/platform/postgres-cluster.yaml 'path: platform/data/postgres'
 test -f platform/data/postgres/kustomization.yaml
+test -f platform/data/postgres/cluster.yaml
+test -f platform/data/postgres/backup-schedule.yaml
+assert_contains platform/data/postgres/kustomization.yaml 'cluster.yaml'
+assert_contains platform/data/postgres/kustomization.yaml 'backup-schedule.yaml'
+assert_not_contains platform/data/postgres/kustomization.yaml 'placeholder-configmap.yaml'
+assert_contains platform/data/postgres/cluster.yaml 'kind: Cluster'
+assert_contains platform/data/postgres/cluster.yaml 'name: datacenter-postgres'
+assert_contains platform/data/postgres/cluster.yaml 'storageClass: local-path'
+assert_contains platform/data/postgres/cluster.yaml 'enablePodMonitor: true'
+assert_contains platform/data/postgres/backup-schedule.yaml 'kind: ScheduledBackup'
+assert_contains platform/data/postgres/backup-schedule.yaml 'name: datacenter-postgres-daily'
 
 assert_contains clusters/datacenter/platform/gateway-api-crds.yaml 'argocd.argoproj.io/sync-wave: "-1"'
 assert_contains clusters/datacenter/platform/istio-base.yaml 'argocd.argoproj.io/sync-wave: "0"'
