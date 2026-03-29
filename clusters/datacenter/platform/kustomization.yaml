@@ -4,6 +4,8 @@ resources:
   - gateway-api-crds.yaml
   - istio-base.yaml
   - istiod.yaml
+  - metallb.yaml
+  - metallb-config.yaml
   - gateway-shared.yaml
   - cert-manager.yaml
   - internal-tls.yaml

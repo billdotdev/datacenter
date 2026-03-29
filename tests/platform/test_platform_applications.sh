@@ -77,6 +77,8 @@ test -f clusters/datacenter/platform/kustomization.yaml
 test -f clusters/datacenter/platform/gateway-api-crds.yaml
 test -f clusters/datacenter/platform/istio-base.yaml
 test -f clusters/datacenter/platform/istiod.yaml
+test -f clusters/datacenter/platform/metallb.yaml
+test -f clusters/datacenter/platform/metallb-config.yaml
 test -f clusters/datacenter/platform/gateway-shared.yaml
 test -f clusters/datacenter/platform/cert-manager.yaml
 test -f clusters/datacenter/platform/internal-tls.yaml
@@ -100,6 +102,8 @@ assert_contains platform/gitops/argocd/bootstrap/argocd-cm-application-health.ya
 
 assert_contains clusters/datacenter/platform/kustomization.yaml 'gateway-api-crds.yaml'
 assert_contains clusters/datacenter/platform/kustomization.yaml 'istiod.yaml'
+assert_contains clusters/datacenter/platform/kustomization.yaml 'metallb.yaml'
+assert_contains clusters/datacenter/platform/kustomization.yaml 'metallb-config.yaml'
 assert_not_contains clusters/datacenter/platform/kustomization.yaml 'ingress-nginx.yaml'
 
 assert_contains clusters/datacenter/platform/gateway-api-crds.yaml 'repoURL: https://github.com/kubernetes-sigs/gateway-api.git'
@@ -116,6 +120,35 @@ assert_contains platform/security/istio/istiod-values.yaml 'global:'
 assert_contains platform/security/istio/istiod-values.yaml 'platform: k3s'
 assert_contains platform/security/istio/istiod-values.yaml 'accessLogFile: /dev/stdout'
 assert_contains platform/security/istio/istiod-values.yaml 'replicaCount: 2'
+
+assert_contains clusters/datacenter/platform/metallb.yaml 'repoURL: https://metallb.github.io/metallb'
+assert_contains clusters/datacenter/platform/metallb.yaml 'chart: metallb'
+assert_contains clusters/datacenter/platform/metallb.yaml 'targetRevision: 0.15.3'
+assert_contains clusters/datacenter/platform/metallb.yaml '$values/platform/network/metallb/values.yaml'
+assert_contains clusters/datacenter/platform/metallb.yaml 'namespace: metallb-system'
+assert_contains clusters/datacenter/platform/metallb.yaml 'ServerSideApply=true'
+test -f platform/network/metallb/values.yaml
+assert_contains platform/network/metallb/values.yaml 'speaker:'
+assert_contains platform/network/metallb/values.yaml 'tolerateMaster: true'
+
+assert_contains clusters/datacenter/platform/metallb-config.yaml 'path: platform/network/metallb/config'
+assert_contains clusters/datacenter/platform/metallb-config.yaml 'namespace: metallb-system'
+assert_contains clusters/datacenter/platform/metallb-config.yaml 'ServerSideApply=true'
+test -f platform/network/metallb/config/kustomization.yaml
+test -f platform/network/metallb/config/namespace.yaml
+test -f platform/network/metallb/config/ip-address-pool.yaml
+test -f platform/network/metallb/config/l2-advertisement.yaml
+assert_contains platform/network/metallb/config/kustomization.yaml 'namespace.yaml'
+assert_contains platform/network/metallb/config/kustomization.yaml 'ip-address-pool.yaml'
+assert_contains platform/network/metallb/config/kustomization.yaml 'l2-advertisement.yaml'
+assert_contains platform/network/metallb/config/namespace.yaml 'name: metallb-system'
+assert_contains platform/network/metallb/config/namespace.yaml 'pod-security.kubernetes.io/enforce: privileged'
+assert_contains platform/network/metallb/config/ip-address-pool.yaml 'kind: IPAddressPool'
+assert_contains platform/network/metallb/config/ip-address-pool.yaml 'name: lan-pool'
+assert_contains platform/network/metallb/config/ip-address-pool.yaml '10.100.0.240-10.100.0.250'
+assert_contains platform/network/metallb/config/l2-advertisement.yaml 'kind: L2Advertisement'
+assert_contains platform/network/metallb/config/l2-advertisement.yaml 'name: lan-pool'
+assert_contains platform/network/metallb/config/l2-advertisement.yaml 'ipAddressPools:'
 
 assert_contains clusters/datacenter/platform/gateway-shared.yaml 'path: platform/security/gateway-api/shared-gateway'
 test -f platform/security/gateway-api/shared-gateway/kustomization.yaml
@@ -207,6 +240,8 @@ assert_contains platform/data/postgres/backup-schedule.yaml 'name: datacenter-po
 assert_contains clusters/datacenter/platform/gateway-api-crds.yaml 'argocd.argoproj.io/sync-wave: "-1"'
 assert_contains clusters/datacenter/platform/istio-base.yaml 'argocd.argoproj.io/sync-wave: "0"'
 assert_contains clusters/datacenter/platform/istiod.yaml 'argocd.argoproj.io/sync-wave: "1"'
+assert_contains clusters/datacenter/platform/metallb.yaml 'argocd.argoproj.io/sync-wave: "1"'
+assert_contains clusters/datacenter/platform/metallb-config.yaml 'argocd.argoproj.io/sync-wave: "2"'
 assert_contains clusters/datacenter/platform/gateway-shared.yaml 'argocd.argoproj.io/sync-wave: "3"'
 assert_contains clusters/datacenter/platform/cert-manager.yaml 'argocd.argoproj.io/sync-wave: "1"'
 assert_contains clusters/datacenter/platform/postgres-operator.yaml 'argocd.argoproj.io/sync-wave: "1"'
@@ -220,6 +255,7 @@ assert_contains clusters/datacenter/platform/promtail.yaml 'argocd.argoproj.io/s
 
 kubectl kustomize clusters/datacenter >/dev/null
 kubectl kustomize clusters/datacenter/platform >/dev/null
+kubectl kustomize platform/network/metallb/config >/dev/null
 kubectl kustomize platform/security/gateway-api/shared-gateway >/dev/null
 kubectl kustomize platform/security/internal-tls >/dev/null
 kubectl kustomize platform/data/postgres >/dev/null
