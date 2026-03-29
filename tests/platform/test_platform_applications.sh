@@ -52,9 +52,28 @@ assert_contains clusters/datacenter/platform/istio-base.yaml 'targetRevision: 1.
 
 assert_contains clusters/datacenter/platform/istiod.yaml '$values/platform/security/istio/istiod-values.yaml'
 test -f platform/security/istio/istiod-values.yaml
+assert_contains platform/security/istio/istiod-values.yaml 'profile: minimal'
+assert_contains platform/security/istio/istiod-values.yaml 'accessLogFile: /dev/stdout'
+assert_contains platform/security/istio/istiod-values.yaml 'replicaCount: 2'
 
 assert_contains clusters/datacenter/platform/gateway-shared.yaml 'path: platform/security/gateway-api/shared-gateway'
 test -f platform/security/gateway-api/shared-gateway/kustomization.yaml
+test -f platform/security/gateway-api/shared-gateway/namespace.yaml
+test -f platform/security/gateway-api/shared-gateway/gateway.yaml
+assert_contains platform/security/gateway-api/shared-gateway/kustomization.yaml 'namespace.yaml'
+assert_contains platform/security/gateway-api/shared-gateway/kustomization.yaml 'gateway.yaml'
+assert_not_contains platform/security/gateway-api/shared-gateway/kustomization.yaml 'placeholder-configmap.yaml'
+assert_contains platform/security/gateway-api/shared-gateway/gateway.yaml 'kind: Gateway'
+assert_contains platform/security/gateway-api/shared-gateway/gateway.yaml 'name: shared-gateway'
+assert_contains platform/security/gateway-api/shared-gateway/gateway.yaml 'namespace: istio-ingress'
+assert_contains platform/security/gateway-api/shared-gateway/gateway.yaml 'gatewayClassName: istio'
+assert_contains platform/security/gateway-api/shared-gateway/gateway.yaml 'name: http'
+assert_contains platform/security/gateway-api/shared-gateway/gateway.yaml 'port: 80'
+assert_contains platform/security/gateway-api/shared-gateway/gateway.yaml 'name: https'
+assert_contains platform/security/gateway-api/shared-gateway/gateway.yaml 'port: 443'
+assert_contains platform/security/gateway-api/shared-gateway/gateway.yaml 'certificateRefs:'
+assert_contains platform/security/gateway-api/shared-gateway/gateway.yaml 'name: datacenter-ingress-tls'
+assert_contains platform/security/gateway-api/shared-gateway/gateway.yaml 'from: All'
 
 assert_contains clusters/datacenter/platform/cert-manager.yaml '$values/platform/security/cert-manager/values.yaml'
 test -f platform/security/cert-manager/values.yaml

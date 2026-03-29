@@ -1,1 +1,5 @@
-{}
+profile: minimal
+meshConfig:
+  accessLogFile: /dev/stdout
+pilot:
+  replicaCount: 2
