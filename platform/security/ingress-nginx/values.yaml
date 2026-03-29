@@ -1,1 +1,12 @@
-{}
+controller:
+  replicaCount: 2
+  metrics:
+    enabled: true
+    serviceMonitor:
+      enabled: true
+  service:
+    type: LoadBalancer
+  admissionWebhooks:
+    enabled: true
+defaultBackend:
+  enabled: true

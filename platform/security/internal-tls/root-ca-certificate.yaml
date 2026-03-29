@@ -1,0 +1,15 @@
+apiVersion: cert-manager.io/v1
+kind: Certificate
+metadata:
+  name: datacenter-root-ca
+  namespace: cert-manager
+spec:
+  isCA: true
+  commonName: datacenter-root-ca
+  secretName: datacenter-root-ca
+  privateKey:
+    algorithm: RSA
+    size: 4096
+  issuerRef:
+    name: datacenter-selfsigned-bootstrap
+    kind: ClusterIssuer
