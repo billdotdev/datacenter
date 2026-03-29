@@ -10,3 +10,6 @@ grep -q 'LC_ALL=en_US.UTF-8 LANG=en_US.UTF-8 ANSIBLE_CONFIG=bootstrap/ansible/an
 grep -q 'ssh-keygen -R "$CP1_IP"' bootstrap/scripts/cluster-up.sh
 grep -q 'ssh -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null -i "$SSH_PRIVATE_KEY_PATH" "$SSH_USER@$CP1_IP" '"'sudo cat /etc/rancher/k3s/k3s.yaml'"' >"$KUBECONFIG"' bootstrap/scripts/cluster-up.sh
 grep -q 'kubectl apply --server-side --force-conflicts -k platform/gitops/argocd/bootstrap' bootstrap/scripts/cluster-up.sh
+grep -q 'argocd.argoproj.io/secret-type: repository' bootstrap/scripts/cluster-up.sh
+grep -q 'https://github.com/billdotdev/datacenter.git' bootstrap/scripts/cluster-up.sh
+grep -q 'GITHUB_FINE_GRAINED_PAT' bootstrap/scripts/cluster-up.sh

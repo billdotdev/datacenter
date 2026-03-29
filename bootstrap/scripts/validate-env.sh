@@ -32,6 +32,8 @@ required_vars=(
   CP3_IP
   SSH_USER
   SSH_PRIVATE_KEY_PATH
+  GITHUB_REPO_USERNAME
+  GITHUB_FINE_GRAINED_PAT
 )
 
 parse_env_file() {

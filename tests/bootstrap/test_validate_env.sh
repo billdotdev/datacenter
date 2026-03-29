@@ -9,6 +9,8 @@ grep -q '^PVE1_API_URL=' bootstrap/config/datacenter.example.env
 grep -q '^PVE2_API_URL=' bootstrap/config/datacenter.example.env
 grep -q '^K3S_INSTALL_CHANNEL=' bootstrap/config/datacenter.example.env
 grep -q '^SSH_USER=' bootstrap/config/datacenter.example.env
+grep -q '^GITHUB_REPO_USERNAME=' bootstrap/config/datacenter.example.env
+grep -q '^GITHUB_FINE_GRAINED_PAT=' bootstrap/config/datacenter.example.env
 grep -q 'bootstrap-validate:' Makefile
 
 run_validate() {
@@ -72,6 +74,8 @@ CP2_IP=10.100.0.112
 CP3_IP=10.100.0.113
 SSH_USER=ubuntu
 SSH_PRIVATE_KEY_PATH=/tmp/id_ed25519
+GITHUB_REPO_USERNAME=billdotdev
+GITHUB_FINE_GRAINED_PAT=github_pat_example
 EOF
 
 cat <<'EOF' >"$valid_home_env"
@@ -98,6 +102,8 @@ CP2_IP=10.100.0.112
 CP3_IP=10.100.0.113
 SSH_USER=ubuntu
 SSH_PRIVATE_KEY_PATH=$HOME/.ssh/id_ed25519
+GITHUB_REPO_USERNAME=billdotdev
+GITHUB_FINE_GRAINED_PAT=github_pat_example
 EOF
 
 cat <<EOF >"$command_substitution_env"
@@ -124,6 +130,8 @@ CP2_IP=10.100.0.112
 CP3_IP=10.100.0.113
 SSH_USER=ubuntu
 SSH_PRIVATE_KEY_PATH=/tmp/id_ed25519
+GITHUB_REPO_USERNAME=billdotdev
+GITHUB_FINE_GRAINED_PAT=github_pat_example
 UNRELATED=\$(touch "$side_effect_marker")literal-value
 EOF
 

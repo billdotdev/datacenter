@@ -9,6 +9,7 @@
 - `PVE1_STORAGE` and `PVE2_STORAGE` match storage IDs that exist on those exact nodes
 - the Terraform API token has clone ACLs on the template VM paths; see `docs/proxmox/network-configuration.md`
 - `bootstrap/config/datacenter.env` exists
+- `GITHUB_REPO_USERNAME` and `GITHUB_FINE_GRAINED_PAT` are set for Argo CD repo access before making the repo private
 
 ## Bring the cluster up
 
@@ -18,6 +19,8 @@ cp infra/proxmox/terraform.tfvars.example infra/proxmox/terraform.tfvars
 make bootstrap-validate
 make cluster-up
 ```
+
+For a private GitHub repo, create a fine-grained PAT with `Contents: Read` and `Metadata: Read`, then set it in `bootstrap/config/datacenter.env`. `make cluster-up` applies an Argo CD repository Secret for `https://github.com/billdotdev/datacenter.git` from those env values.
 
 ## Verify the cluster
 

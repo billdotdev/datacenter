@@ -135,6 +135,23 @@ ssh -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null -i "$SSH_PRIVATE
 sed -i.bak "s/127.0.0.1/$CP1_IP/g" "$KUBECONFIG"
 
 kubectl apply --server-side --force-conflicts -k platform/gitops/argocd/bootstrap
+ARGOCD_REPO_SECRET_MANIFEST="$(mktemp)"
+cat >"$ARGOCD_REPO_SECRET_MANIFEST" <<EOF
+apiVersion: v1
+kind: Secret
+metadata:
+  name: argocd-repo-datacenter
+  namespace: argocd
+  labels:
+    argocd.argoproj.io/secret-type: repository
+stringData:
+  type: git
+  url: https://github.com/billdotdev/datacenter.git
+  username: ${GITHUB_REPO_USERNAME}
+  password: ${GITHUB_FINE_GRAINED_PAT}
+EOF
+kubectl apply -f "$ARGOCD_REPO_SECRET_MANIFEST"
+rm -f "$ARGOCD_REPO_SECRET_MANIFEST"
 kubectl apply -f platform/gitops/argocd/root-project.yaml
 kubectl apply -f platform/gitops/argocd/root-application.yaml
 
