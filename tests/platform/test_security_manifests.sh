@@ -17,7 +17,8 @@ grep -q 'type: LoadBalancer' platform/security/ingress-nginx/values.yaml
 grep -q 'admissionWebhooks:' platform/security/ingress-nginx/values.yaml
 grep -q '^defaultBackend:$' platform/security/ingress-nginx/values.yaml
 
-grep -q 'installCRDs: true' platform/security/cert-manager/values.yaml
+grep -q '^crds:$' platform/security/cert-manager/values.yaml
+grep -q 'enabled: true' platform/security/cert-manager/values.yaml
 grep -q '^prometheus:$' platform/security/cert-manager/values.yaml
 grep -q 'timeoutSeconds: 10' platform/security/cert-manager/values.yaml
 
