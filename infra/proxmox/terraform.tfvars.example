@@ -21,7 +21,8 @@ control_plane_vms = {
     vm_id        = 201
     ip           = "10.100.0.111"
     cores        = 4
-    memory       = 7168
+    memory       = 5120
+    memory_min   = 3072
     disk_gb      = 40
     proxmox_host = "pve1"
   }
@@ -29,7 +30,8 @@ control_plane_vms = {
     vm_id        = 202
     ip           = "10.100.0.112"
     cores        = 4
-    memory       = 7168
+    memory       = 5120
+    memory_min   = 3072
     disk_gb      = 40
     proxmox_host = "pve1"
   }
@@ -37,7 +39,8 @@ control_plane_vms = {
     vm_id        = 301
     ip           = "10.100.0.113"
     cores        = 4
-    memory       = 7168
+    memory       = 5120
+    memory_min   = 3072
     disk_gb      = 40
     proxmox_host = "pve2"
   }

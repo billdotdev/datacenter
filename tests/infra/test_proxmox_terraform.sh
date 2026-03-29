@@ -10,6 +10,12 @@ grep -q 'provider  = proxmox.pve2' infra/proxmox/main.tf
 grep -q 'pve1_api_url' infra/proxmox/variables.tf
 grep -q 'pve2_api_url' infra/proxmox/variables.tf
 grep -q 'proxmox_host = "pve2"' infra/proxmox/terraform.tfvars.example
+grep -q 'cp-1 = {' infra/proxmox/terraform.tfvars.example
+grep -q 'cp-2 = {' infra/proxmox/terraform.tfvars.example
+grep -q 'cp-3 = {' infra/proxmox/terraform.tfvars.example
+grep -q 'memory       = 5120' infra/proxmox/terraform.tfvars.example
+grep -q 'memory_min   = 3072' infra/proxmox/terraform.tfvars.example
+grep -q 'floating  = each.value.memory_min' infra/proxmox/main.tf
 grep -q 'interface    = "scsi0"' infra/proxmox/main.tf
 if grep -q 'interface    = "virtio0"' infra/proxmox/main.tf; then
   echo 'root disk must stay on scsi0 so cloned cloud image storage is actually resized' >&2

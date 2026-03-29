@@ -66,6 +66,7 @@ variable "control_plane_vms" {
     ip           = string
     cores        = number
     memory       = number
+    memory_min   = number
     disk_gb      = number
     proxmox_host = string
   }))

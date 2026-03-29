@@ -27,6 +27,7 @@ resource "proxmox_virtual_environment_vm" "control_plane_pve1" {
 
   memory {
     dedicated = each.value.memory
+    floating  = each.value.memory_min
   }
 
   serial_device {
@@ -79,6 +80,7 @@ resource "proxmox_virtual_environment_vm" "control_plane_pve2" {
 
   memory {
     dedicated = each.value.memory
+    floating  = each.value.memory_min
   }
 
   serial_device {

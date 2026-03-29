@@ -90,6 +90,7 @@ test -f clusters/datacenter/platform/chaos-mesh.yaml
 test -f platform/gitops/argocd/bootstrap/argocd-cm-application-health.yaml
 
 assert_contains clusters/datacenter/kustomization.yaml '  - platform'
+assert_not_contains clusters/datacenter/kustomization.yaml '  - root-application.yaml'
 assert_contains platform/gitops/argocd/bootstrap/kustomization.yaml 'argocd-cm-application-health.yaml'
 assert_contains platform/gitops/argocd/bootstrap/argocd-cm-application-health.yaml 'kind: ConfigMap'
 assert_contains platform/gitops/argocd/bootstrap/argocd-cm-application-health.yaml 'name: argocd-cm'
