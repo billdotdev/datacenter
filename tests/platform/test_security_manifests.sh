@@ -23,6 +23,7 @@ test -f platform/security/gateway-api/shared-gateway/kustomization.yaml
 test -f platform/security/gateway-api/shared-gateway/namespace.yaml
 test -f platform/security/gateway-api/shared-gateway/gateway.yaml
 test -f platform/security/internal-tls/kustomization.yaml
+test -f platform/security/internal-tls/namespace.yaml
 test -f platform/security/internal-tls/root-selfsigned-issuer.yaml
 test -f platform/security/internal-tls/root-ca-certificate.yaml
 test -f platform/security/internal-tls/cluster-issuer.yaml
@@ -49,6 +50,10 @@ assert_contains platform/security/gateway-api/shared-gateway/gateway.yaml 'port:
 assert_contains platform/security/gateway-api/shared-gateway/gateway.yaml 'certificateRefs:'
 assert_contains platform/security/gateway-api/shared-gateway/gateway.yaml 'name: datacenter-ingress-tls'
 assert_contains platform/security/gateway-api/shared-gateway/gateway.yaml 'from: All'
+
+assert_contains platform/security/internal-tls/kustomization.yaml 'namespace.yaml'
+assert_contains platform/security/internal-tls/namespace.yaml 'kind: Namespace'
+assert_contains platform/security/internal-tls/namespace.yaml 'name: istio-ingress'
 
 assert_contains platform/security/cert-manager/values.yaml 'crds:'
 assert_contains platform/security/cert-manager/values.yaml 'prometheus:'

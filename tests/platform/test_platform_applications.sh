@@ -95,7 +95,10 @@ test -f platform/chaos/chaos-mesh/values.yaml
 
 assert_contains clusters/datacenter/platform/internal-tls.yaml 'path: platform/security/internal-tls'
 test -f platform/security/internal-tls/kustomization.yaml
+test -f platform/security/internal-tls/namespace.yaml
 test -f platform/security/internal-tls/ingress-certificate.yaml
+assert_contains platform/security/internal-tls/kustomization.yaml 'namespace.yaml'
+assert_contains platform/security/internal-tls/namespace.yaml 'name: istio-ingress'
 assert_contains platform/security/internal-tls/kustomization.yaml 'ingress-certificate.yaml'
 assert_contains platform/security/internal-tls/ingress-certificate.yaml 'name: datacenter-ingress-tls'
 assert_contains platform/security/internal-tls/ingress-certificate.yaml 'namespace: istio-ingress'
