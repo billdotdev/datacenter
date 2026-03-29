@@ -24,3 +24,7 @@ gateway:
 monitoring:
   serviceMonitor:
     enabled: true
+chunksCache:
+  allocatedMemory: 1024
+resultsCache:
+  allocatedMemory: 512
