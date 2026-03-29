@@ -40,6 +40,7 @@ expect_application_healthy() {
 kubectl get nodes
 kubectl wait --for=condition=Ready nodes --all --timeout=180s
 kubectl wait --for=condition=Available deployment/argocd-server -n argocd --timeout=180s
+kubectl wait --for=condition=Available deployment/argocd-repo-server -n argocd --timeout=180s
 kubectl get applications -n argocd
 expect_application_healthy datacenter-root
 expect_application_healthy gateway-api-crds

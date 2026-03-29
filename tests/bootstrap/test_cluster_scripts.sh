@@ -18,6 +18,7 @@ grep -q 'GITHUB_FINE_GRAINED_PAT' bootstrap/scripts/cluster-up.sh
 grep -q 'gateway.gateway.networking.k8s.io/shared-gateway' bootstrap/scripts/cluster-verify.sh
 grep -q 'certificate.cert-manager.io/datacenter-ingress-tls' bootstrap/scripts/cluster-verify.sh
 grep -q 'cluster.postgresql.cnpg.io/datacenter-postgres' bootstrap/scripts/cluster-verify.sh
+grep -q 'deployment/argocd-repo-server' bootstrap/scripts/cluster-verify.sh
 grep -q 'jsonpath=' bootstrap/scripts/cluster-verify.sh
 grep -q 'GHCR_USERNAME' bootstrap/scripts/dashboard-registry-secret.sh
 grep -q 'GHCR_PULL_TOKEN' bootstrap/scripts/dashboard-registry-secret.sh

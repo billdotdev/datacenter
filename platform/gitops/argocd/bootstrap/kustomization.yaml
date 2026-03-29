@@ -9,3 +9,7 @@ patches:
     target:
       kind: ConfigMap
       name: argocd-cm
+  - path: argocd-repo-server-hardening.yaml
+    target:
+      kind: Deployment
+      name: argocd-repo-server
