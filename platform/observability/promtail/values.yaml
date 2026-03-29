@@ -1,1 +1,8 @@
-{}
+config:
+  clients:
+    - url: http://loki-gateway.observability.svc.cluster.local/loki/api/v1/push
+  snippets:
+    pipelineStages:
+      - cri: {}
+serviceMonitor:
+  enabled: true

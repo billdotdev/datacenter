@@ -1,1 +1,22 @@
-{}
+grafana:
+  enabled: true
+  adminPassword: changeme-before-prod
+  service:
+    type: ClusterIP
+  grafana.ini:
+    server:
+      root_url: https://grafana.datacenter.lan
+prometheus:
+  prometheusSpec:
+    retention: 7d
+    storageSpec:
+      volumeClaimTemplate:
+        spec:
+          storageClassName: local-path
+          accessModes:
+            - ReadWriteOnce
+          resources:
+            requests:
+              storage: 20Gi
+alertmanager:
+  enabled: false
