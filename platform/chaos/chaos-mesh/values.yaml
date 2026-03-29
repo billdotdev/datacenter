@@ -1,1 +1,9 @@
-{}
+dashboard:
+  create: false
+controllerManager:
+  replicaCount: 1
+chaosDaemon:
+  runtime: containerd
+  socketPath: /run/k3s/containerd/containerd.sock
+dnsServer:
+  create: false
