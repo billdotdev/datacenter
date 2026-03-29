@@ -3,3 +3,4 @@ kind: Kustomization
 resources:
   - root-project.yaml
   - root-application.yaml
+  - platform

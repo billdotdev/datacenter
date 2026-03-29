@@ -1,0 +1,18 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: internal-tls
+  namespace: argocd
+spec:
+  project: datacenter
+  source:
+    repoURL: https://github.com/billdotdev/datacenter.git
+    targetRevision: main
+    path: platform/security/internal-tls
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: cert-manager
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
