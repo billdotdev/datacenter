@@ -29,6 +29,8 @@ test -f clusters/datacenter/platform/loki.yaml
 test -f clusters/datacenter/platform/promtail.yaml
 test -f clusters/datacenter/platform/chaos-mesh.yaml
 
+assert_contains clusters/datacenter/kustomization.yaml '  - platform'
+
 assert_contains clusters/datacenter/platform/kustomization.yaml 'gateway-api-crds.yaml'
 assert_contains clusters/datacenter/platform/kustomization.yaml 'istiod.yaml'
 assert_not_contains clusters/datacenter/platform/kustomization.yaml 'ingress-nginx.yaml'
