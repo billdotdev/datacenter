@@ -32,3 +32,5 @@ grep -q 'podchaos' clusters/datacenter/dashboard-chaos-access.yaml
 grep -q 'namespace: chaos-mesh' clusters/datacenter/dashboard-chaos-access.yaml
 grep -q 'namespace: dashboard' clusters/datacenter/dashboard-chaos-access.yaml
 grep -q 'pods' clusters/datacenter/dashboard-chaos-access.yaml
+grep -q 'namespaces' clusters/datacenter/dashboard-chaos-access.yaml
+grep -q 'ClusterRoleBinding' clusters/datacenter/dashboard-chaos-access.yaml

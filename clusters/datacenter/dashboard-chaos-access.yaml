@@ -38,7 +38,6 @@ rules:
       - ""
     resources:
       - pods
-      - namespaces
     verbs:
       - get
       - list
@@ -53,6 +52,33 @@ roleRef:
   apiGroup: rbac.authorization.k8s.io
   kind: Role
   name: dashboard-chaos-target-reader
+subjects:
+  - kind: ServiceAccount
+    name: dashboard
+    namespace: dashboard
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  name: dashboard-chaos-namespace-reader
+rules:
+  - apiGroups:
+      - ""
+    resources:
+      - namespaces
+    verbs:
+      - get
+      - list
+      - watch
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRoleBinding
+metadata:
+  name: dashboard-chaos-namespace-reader
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: ClusterRole
+  name: dashboard-chaos-namespace-reader
 subjects:
   - kind: ServiceAccount
     name: dashboard
