@@ -30,3 +30,5 @@ grep -q 'applications' apps/dashboard/k8s/clusterrole.yaml
 grep -q 'nodes' apps/dashboard/k8s/clusterrole.yaml
 grep -q 'podchaos' clusters/datacenter/dashboard-chaos-access.yaml
 grep -q 'namespace: chaos-mesh' clusters/datacenter/dashboard-chaos-access.yaml
+grep -q 'namespace: dashboard' clusters/datacenter/dashboard-chaos-access.yaml
+grep -q 'pods' clusters/datacenter/dashboard-chaos-access.yaml
