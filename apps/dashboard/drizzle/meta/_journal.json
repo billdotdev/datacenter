@@ -8,6 +8,13 @@
       "when": 1774817720757,
       "tag": "0000_wet_photon",
       "breakpoints": true
+    },
+    {
+      "idx": 1,
+      "version": "7",
+      "when": 1774890000000,
+      "tag": "0001_dashboard_drill_execution",
+      "breakpoints": true
     }
   ]
 }
