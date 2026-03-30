@@ -59,3 +59,23 @@ Open `https://dashboard.datacenter.lan/` and confirm:
 - node list renders
 - Argo applications render
 - refresh updates without a full page reload
+
+## Dashboard Drill Execution
+
+Before executing drills, verify the safety gate state in `/admin` or `/drills`.
+
+After syncing the latest image, verify:
+
+```bash
+kubectl -n dashboard rollout status deployment/dashboard
+kubectl -n chaos-mesh get rolebinding dashboard-chaos-runner
+kubectl -n chaos-mesh get podchaos
+```
+
+Open `https://dashboard.datacenter.lan/drills` and confirm:
+
+- the `pod-delete-dashboard` card renders
+- `viewer` cannot execute
+- `operator` or `admin` can execute when disruptive actions are enabled
+- a new run row appears after execution
+- a `PodChaos` object appears in namespace `chaos-mesh`

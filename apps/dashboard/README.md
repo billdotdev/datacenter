@@ -42,13 +42,35 @@ Refresh behavior:
 - initial SSR load
 - client polling every 20 seconds
 
+## Phase 4 Drill Execution
+
+The dashboard now exposes a dedicated `/drills` route for the first controlled
+write path.
+
+Current drill slice:
+
+- one seeded drill: `pod-delete-dashboard`
+- `viewer` can read catalog and run history only
+- `operator` and `admin` can execute when disruptive actions are enabled
+- `admin` can toggle the global disruptive actions safety gate
+
+Execution backend:
+
+- app-owned PostgreSQL drill definitions, runs, and audit log
+- backend-created Chaos Mesh `PodChaos`
+- fixed allowlist target: dashboard pods in namespace `dashboard`
+
 ## Build and test
 
 ```bash
 pnpm test -- src/lib/auth-flow.test.ts
 pnpm test -- src/lib/cluster/derive-cluster-snapshot.test.ts
 pnpm test -- src/lib/cluster/read-cluster-snapshot.test.ts
+pnpm test -- src/lib/drills/policy.test.ts
+pnpm test -- src/lib/drills/chaos-client.test.ts
+pnpm test -- src/lib/drills/service.test.ts
 pnpm test -- src/components/cluster-overview.test.tsx
+pnpm test -- src/components/drill-catalog.test.tsx
 pnpm build
 ```
 

@@ -28,3 +28,5 @@ grep -q 'serviceAccountName: dashboard' apps/dashboard/k8s/deployment.yaml
 grep -q 'argoproj.io' apps/dashboard/k8s/clusterrole.yaml
 grep -q 'applications' apps/dashboard/k8s/clusterrole.yaml
 grep -q 'nodes' apps/dashboard/k8s/clusterrole.yaml
+grep -q 'podchaos' clusters/datacenter/dashboard-chaos-access.yaml
+grep -q 'namespace: chaos-mesh' clusters/datacenter/dashboard-chaos-access.yaml

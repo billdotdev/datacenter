@@ -4,3 +4,4 @@ resources:
   - root-project.yaml
   - platform
   - dashboard.yaml
+  - dashboard-chaos-access.yaml
