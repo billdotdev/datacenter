@@ -50,6 +50,57 @@ function toDefinitionRecord(row: typeof drillDefinition.$inferSelect): DrillDefi
   };
 }
 
+type PodChaosLike = {
+  status?: {
+    conditions?: Array<{
+      status?: string;
+      type?: string;
+    }>;
+    experiment?: {
+      desiredPhase?: string;
+    };
+  };
+};
+
+export function reconcileRunStatusFromObject(object: PodChaosLike): {
+  errorMessage: string | null;
+  status: "failed" | "running" | "succeeded";
+} {
+  const desiredPhase = object.status?.experiment?.desiredPhase;
+  const conditions = object.status?.conditions ?? [];
+  const hasCondition = (type: string, status: string) =>
+    conditions.some(
+      (condition) => condition.type === type && condition.status === status,
+    );
+
+  if (desiredPhase === "Failed") {
+    return {
+      errorMessage: "Chaos Mesh marked the run as failed",
+      status: "failed",
+    };
+  }
+
+  if (desiredPhase === "Finished" || hasCondition("AllRecovered", "True")) {
+    return {
+      errorMessage: null,
+      status: "succeeded",
+    };
+  }
+
+  // One-shot PodChaos without duration stays in Run after successful injection.
+  if (desiredPhase === "Run" && hasCondition("AllInjected", "True")) {
+    return {
+      errorMessage: null,
+      status: "succeeded",
+    };
+  }
+
+  return {
+    errorMessage: null,
+    status: "running",
+  };
+}
+
 export async function readDisruptiveActionsEnabled() {
   const config = await db.query.appConfig.findFirst({
     where: eq(appConfig.key, "disruptive_actions_enabled"),
@@ -341,12 +392,10 @@ async function reconcileRunStatuses() {
         return;
       }
 
-      const object = (await getPodChaos(row.chaosName)) as {
-        status?: { experiment?: { desiredPhase?: string } };
-      };
-      const desiredPhase = object.status?.experiment?.desiredPhase;
+      const object = (await getPodChaos(row.chaosName)) as PodChaosLike;
+      const nextStatus = reconcileRunStatusFromObject(object);
 
-      if (desiredPhase === "Finished") {
+      if (nextStatus.status === "succeeded") {
         await updateRun(row.id, {
           finishedAt: new Date().toISOString(),
           status: "succeeded",
@@ -358,9 +407,9 @@ async function reconcileRunStatuses() {
           subjectId: row.id,
           subjectType: "drill_run",
         });
-      } else if (desiredPhase === "Failed") {
+      } else if (nextStatus.status === "failed") {
         await updateRun(row.id, {
-          errorMessage: "Chaos Mesh marked the run as failed",
+          errorMessage: nextStatus.errorMessage ?? "Chaos Mesh marked the run as failed",
           finishedAt: new Date().toISOString(),
           status: "failed",
         });

@@ -3,6 +3,7 @@ import { describe, expect, it, vi } from "vitest";
 import {
   executeDrillAction,
   readDrillCatalogData,
+  reconcileRunStatusFromObject,
   setDisruptiveActions,
 } from "./service";
 
@@ -90,5 +91,45 @@ describe("setDisruptiveActions", () => {
         user: { id: "user-123", name: "Op User" },
       }),
     ).rejects.toThrow("Forbidden");
+  });
+});
+
+describe("reconcileRunStatusFromObject", () => {
+  it("marks a run succeeded when PodChaos has injected faults without duration", () => {
+    expect(
+      reconcileRunStatusFromObject({
+        kind: "PodChaos",
+        status: {
+          conditions: [
+            { status: "False", type: "Paused" },
+            { status: "True", type: "Selected" },
+            { status: "True", type: "AllInjected" },
+            { status: "False", type: "AllRecovered" },
+          ],
+          experiment: {
+            desiredPhase: "Run",
+          },
+        },
+      }),
+    ).toEqual({
+      errorMessage: null,
+      status: "succeeded",
+    });
+  });
+
+  it("marks a run failed when PodChaos reports failed phase", () => {
+    expect(
+      reconcileRunStatusFromObject({
+        kind: "PodChaos",
+        status: {
+          experiment: {
+            desiredPhase: "Failed",
+          },
+        },
+      }),
+    ).toEqual({
+      errorMessage: "Chaos Mesh marked the run as failed",
+      status: "failed",
+    });
   });
 });
