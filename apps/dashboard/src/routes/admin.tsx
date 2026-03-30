@@ -1,6 +1,12 @@
+import { useMutation } from "@tanstack/react-query";
 import { Link, createFileRoute, redirect } from "@tanstack/react-router";
+import { useState } from "react";
 
 import { Button } from "#/components/ui/button";
+import {
+  readDrillCatalog,
+  setDisruptiveActionsEnabled,
+} from "#/lib/drills/server";
 import { readAuthPage } from "#/lib/session";
 
 export const Route = createFileRoute("/admin")({
@@ -13,13 +19,25 @@ export const Route = createFileRoute("/admin")({
       throw redirect({ to: authPage.decision.redirectTo });
     }
 
-    return authPage;
+    return {
+      authPage,
+      drillCatalog: await readDrillCatalog(),
+    };
   },
   component: AdminPage,
 });
 
 function AdminPage() {
-  const { session } = Route.useLoaderData();
+  const { authPage, drillCatalog } = Route.useLoaderData();
+  const [enabled, setEnabled] = useState(drillCatalog.disruptiveActionsEnabled);
+
+  const toggleMutation = useMutation({
+    mutationFn: (nextEnabled: boolean) =>
+      setDisruptiveActionsEnabled({ data: { enabled: nextEnabled } }),
+    onSuccess: (_, nextEnabled) => {
+      setEnabled(nextEnabled);
+    },
+  });
 
   return (
     <main className="page-wrap px-4 pb-10 pt-14">
@@ -29,14 +47,32 @@ function AdminPage() {
           Admin-only route confirmed.
         </h1>
         <p className="mb-8 max-w-3xl text-base leading-8 text-[var(--sea-ink-soft)]">
-          {session?.user.email} is authenticated as{" "}
-          <code>{session?.user.role}</code>. This placeholder exists to prove
-          role-aware routing before user management screens land.
+          {authPage.session?.user.email} is authenticated as{" "}
+          <code>{authPage.session?.user.role}</code>.
+        </p>
+        <p className="mb-6 max-w-3xl text-base leading-8 text-[var(--sea-ink-soft)]">
+          Disruptive actions are currently{" "}
+          <strong>{enabled ? "enabled" : "disabled"}</strong>.
+        </p>
+        <p className="mb-8 max-w-3xl text-sm leading-7 text-[var(--sea-ink-soft)]">
+          When disabled, every manual drill request fails closed for all roles,
+          including admins.
         </p>
 
-        <Button asChild variant="outline">
-          <Link to="/">Back to dashboard</Link>
-        </Button>
+        <div className="flex flex-wrap gap-3">
+          <Button
+            onClick={() => toggleMutation.mutate(!enabled)}
+            disabled={toggleMutation.isPending}
+          >
+            {enabled ? "Disable disruptive actions" : "Enable disruptive actions"}
+          </Button>
+          <Button asChild>
+            <Link to="/drills">Go to drills</Link>
+          </Button>
+          <Button asChild variant="outline">
+            <Link to="/">Back to dashboard</Link>
+          </Button>
+        </div>
       </section>
     </main>
   );

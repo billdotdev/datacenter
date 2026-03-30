@@ -12,6 +12,7 @@ import { Route as rootRouteImport } from './routes/__root'
 import { Route as SetupRouteImport } from './routes/setup'
 import { Route as LoginRouteImport } from './routes/login'
 import { Route as HealthRouteImport } from './routes/health'
+import { Route as DrillsRouteImport } from './routes/drills'
 import { Route as AdminRouteImport } from './routes/admin'
 import { Route as AboutRouteImport } from './routes/about'
 import { Route as IndexRouteImport } from './routes/index'
@@ -30,6 +31,11 @@ const LoginRoute = LoginRouteImport.update({
 const HealthRoute = HealthRouteImport.update({
   id: '/health',
   path: '/health',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const DrillsRoute = DrillsRouteImport.update({
+  id: '/drills',
+  path: '/drills',
   getParentRoute: () => rootRouteImport,
 } as any)
 const AdminRoute = AdminRouteImport.update({
@@ -57,6 +63,7 @@ export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/about': typeof AboutRoute
   '/admin': typeof AdminRoute
+  '/drills': typeof DrillsRoute
   '/health': typeof HealthRoute
   '/login': typeof LoginRoute
   '/setup': typeof SetupRoute
@@ -66,6 +73,7 @@ export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/about': typeof AboutRoute
   '/admin': typeof AdminRoute
+  '/drills': typeof DrillsRoute
   '/health': typeof HealthRoute
   '/login': typeof LoginRoute
   '/setup': typeof SetupRoute
@@ -76,6 +84,7 @@ export interface FileRoutesById {
   '/': typeof IndexRoute
   '/about': typeof AboutRoute
   '/admin': typeof AdminRoute
+  '/drills': typeof DrillsRoute
   '/health': typeof HealthRoute
   '/login': typeof LoginRoute
   '/setup': typeof SetupRoute
@@ -87,6 +96,7 @@ export interface FileRouteTypes {
     | '/'
     | '/about'
     | '/admin'
+    | '/drills'
     | '/health'
     | '/login'
     | '/setup'
@@ -96,6 +106,7 @@ export interface FileRouteTypes {
     | '/'
     | '/about'
     | '/admin'
+    | '/drills'
     | '/health'
     | '/login'
     | '/setup'
@@ -105,6 +116,7 @@ export interface FileRouteTypes {
     | '/'
     | '/about'
     | '/admin'
+    | '/drills'
     | '/health'
     | '/login'
     | '/setup'
@@ -115,6 +127,7 @@ export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   AboutRoute: typeof AboutRoute
   AdminRoute: typeof AdminRoute
+  DrillsRoute: typeof DrillsRoute
   HealthRoute: typeof HealthRoute
   LoginRoute: typeof LoginRoute
   SetupRoute: typeof SetupRoute
@@ -142,6 +155,13 @@ declare module '@tanstack/react-router' {
       path: '/health'
       fullPath: '/health'
       preLoaderRoute: typeof HealthRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/drills': {
+      id: '/drills'
+      path: '/drills'
+      fullPath: '/drills'
+      preLoaderRoute: typeof DrillsRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/admin': {
@@ -179,6 +199,7 @@ const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   AboutRoute: AboutRoute,
   AdminRoute: AdminRoute,
+  DrillsRoute: DrillsRoute,
   HealthRoute: HealthRoute,
   LoginRoute: LoginRoute,
   SetupRoute: SetupRoute,
