@@ -74,6 +74,7 @@ assert_no_duplicate_resources() {
 }
 
 test -f clusters/datacenter/platform/kustomization.yaml
+test -f clusters/datacenter/platform/argocd-access.yaml
 test -f clusters/datacenter/platform/gateway-api-crds.yaml
 test -f clusters/datacenter/platform/istio-base.yaml
 test -f clusters/datacenter/platform/istiod.yaml
@@ -95,6 +96,7 @@ test -f platform/gitops/argocd/bootstrap/argocd-server-resources.yaml
 test -f platform/gitops/argocd/bootstrap/argocd-dex-server-resources.yaml
 test -f platform/gitops/argocd/bootstrap/argocd-redis-resources.yaml
 test -f platform/gitops/argocd/bootstrap/argocd-repo-server-hardening.yaml
+test -f platform/gitops/argocd/access/kustomization.yaml
 
 assert_contains clusters/datacenter/kustomization.yaml '  - platform'
 assert_not_contains clusters/datacenter/kustomization.yaml '  - root-application.yaml'
@@ -123,10 +125,19 @@ assert_contains platform/gitops/argocd/bootstrap/argocd-repo-server-hardening.ya
 assert_contains platform/gitops/argocd/bootstrap/argocd-repo-server-hardening.yaml 'memory: 256Mi'
 
 assert_contains clusters/datacenter/platform/kustomization.yaml 'gateway-api-crds.yaml'
+assert_contains clusters/datacenter/platform/kustomization.yaml 'argocd-access.yaml'
 assert_contains clusters/datacenter/platform/kustomization.yaml 'istiod.yaml'
 assert_contains clusters/datacenter/platform/kustomization.yaml 'metallb.yaml'
 assert_contains clusters/datacenter/platform/kustomization.yaml 'metallb-config.yaml'
 assert_not_contains clusters/datacenter/platform/kustomization.yaml 'ingress-nginx.yaml'
+
+assert_contains clusters/datacenter/platform/argocd-access.yaml 'name: argocd-access'
+assert_contains clusters/datacenter/platform/argocd-access.yaml 'path: platform/gitops/argocd/access'
+assert_contains clusters/datacenter/platform/argocd-access.yaml 'namespace: argocd'
+assert_contains clusters/datacenter/platform/argocd-access.yaml 'ServerSideApply=true'
+assert_contains platform/gitops/argocd/access/kustomization.yaml 'namespace: argocd'
+assert_contains platform/gitops/argocd/access/kustomization.yaml 'argocd-cmd-params-cm-server-insecure.yaml'
+assert_contains platform/gitops/argocd/access/kustomization.yaml 'argocd-server-httproute.yaml'
 
 assert_contains clusters/datacenter/platform/gateway-api-crds.yaml 'repoURL: https://github.com/kubernetes-sigs/gateway-api.git'
 assert_contains clusters/datacenter/platform/gateway-api-crds.yaml 'targetRevision: v1.4.0'
