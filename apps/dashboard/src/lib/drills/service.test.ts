@@ -8,20 +8,62 @@ import {
 } from "./service";
 
 describe("readDrillCatalogData", () => {
-  it("returns drill cards, safety state, and recent runs", async () => {
+  it("returns drill cards with only compatible targets", async () => {
     const result = await readDrillCatalogData({
       listDefinitions: async () => [
         {
-          blastRadiusSummary: "Restarts one dashboard pod in namespace dashboard.",
-          chaosTemplate: { action: "pod-kill", mode: "one" },
+          blastRadiusSummary: "Restarts one approved workload pod.",
           enabled: true,
-          id: "drill-pod-delete-dashboard",
-          key: "pod-delete-dashboard",
+          id: "drill-pod-delete",
+          key: "pod-delete",
           kind: "pod_delete",
-          name: "Delete One Dashboard Pod",
+          name: "Delete One Pod",
           requiresDisruptiveActions: true,
-          targetNamespace: "dashboard",
-          targetSelector: { "app.kubernetes.io/name": "dashboard" },
+          targetType: "workload",
+          template: { action: "pod-kill", executor: "podChaos", mode: "one" },
+        },
+        {
+          blastRadiusSummary: "Generate fixed HTTP load.",
+          enabled: true,
+          id: "drill-traffic-spike",
+          key: "traffic-spike",
+          kind: "traffic_spike",
+          name: "Traffic Spike",
+          requiresDisruptiveActions: true,
+          targetType: "workload",
+          template: {
+            durationSeconds: 60,
+            executor: "loadJob",
+            requestsPerSecond: 25,
+          },
+        },
+      ],
+      listTargets: async () => [
+        {
+          blastRadiusSummary: "Affects the dashboard service only.",
+          enabled: true,
+          id: "target-dashboard",
+          key: "dashboard",
+          kind: "workload",
+          name: "Dashboard",
+          namespace: "dashboard",
+          nodeName: null,
+          selector: { "app.kubernetes.io/name": "dashboard" },
+          serviceName: "dashboard",
+          targetSummary: "dashboard/dashboard",
+        },
+        {
+          blastRadiusSummary: "Affects the PostgreSQL cluster pods only.",
+          enabled: true,
+          id: "target-datacenter-postgres",
+          key: "datacenter-postgres",
+          kind: "workload",
+          name: "Datacenter Postgres",
+          namespace: "database",
+          nodeName: null,
+          selector: { "cnpg.io/cluster": "datacenter-postgres" },
+          serviceName: null,
+          targetSummary: "database/datacenter-postgres",
         },
       ],
       listRuns: async () => [],
@@ -30,12 +72,22 @@ describe("readDrillCatalogData", () => {
     });
 
     expect(result.disruptiveActionsEnabled).toBe(false);
-    expect(result.drills[0]?.key).toBe("pod-delete-dashboard");
+    expect(result.drills[0]).toMatchObject({
+      key: "pod-delete",
+      targets: [
+        { key: "dashboard" },
+        { key: "datacenter-postgres" },
+      ],
+    });
+    expect(result.drills[1]).toMatchObject({
+      key: "traffic-spike",
+      targets: [{ key: "dashboard" }],
+    });
   });
 });
 
 describe("executeDrillAction", () => {
-  it("creates a run and PodChaos for an operator", async () => {
+  it("creates a run and PodChaos for an operator-selected target", async () => {
     const createPodChaos = vi.fn(async () => undefined);
     const insertAuditEvent = vi.fn(async () => undefined);
     const insertRun = vi.fn(async () => ({
@@ -47,22 +99,34 @@ describe("executeDrillAction", () => {
     const result = await executeDrillAction({
       createPodChaos,
       drill: {
-        blastRadiusSummary: "Restarts one dashboard pod in namespace dashboard.",
-        chaosTemplate: { action: "pod-kill", mode: "one" },
+        blastRadiusSummary: "Restarts one approved workload pod.",
         enabled: true,
-        id: "drill-pod-delete-dashboard",
-        key: "pod-delete-dashboard",
+        id: "drill-pod-delete",
+        key: "pod-delete",
         kind: "pod_delete",
-        name: "Delete One Dashboard Pod",
+        name: "Delete One Pod",
         requiresDisruptiveActions: true,
-        targetNamespace: "dashboard",
-        targetSelector: { "app.kubernetes.io/name": "dashboard" },
+        targetType: "workload",
+        template: { action: "pod-kill", executor: "podChaos", mode: "one" },
       },
       disruptiveActionsEnabled: true,
       insertAuditEvent,
       insertRun,
       now: () => new Date("2026-03-30T12:00:00.000Z"),
       role: "operator",
+      target: {
+        blastRadiusSummary: "Affects the dashboard service only.",
+        enabled: true,
+        id: "target-dashboard",
+        key: "dashboard",
+        kind: "workload",
+        name: "Dashboard",
+        namespace: "dashboard",
+        nodeName: null,
+        selector: { "app.kubernetes.io/name": "dashboard" },
+        serviceName: "dashboard",
+        targetSummary: "dashboard/dashboard",
+      },
       updateRun,
       user: { id: "user-123", name: "Op User" },
     });
@@ -70,10 +134,16 @@ describe("executeDrillAction", () => {
     expect(result.status).toBe("running");
     expect(createPodChaos).toHaveBeenCalledTimes(1);
     expect(insertAuditEvent).toHaveBeenCalledTimes(2);
+    expect(insertRun).toHaveBeenCalledWith(
+      expect.objectContaining({
+        drillKey: "pod-delete",
+        targetKey: "dashboard",
+      }),
+    );
     expect(updateRun).toHaveBeenCalledWith(
       "run-123",
       expect.objectContaining({
-        chaosName: "dashboard-run-123",
+        chaosName: "pod-delete-run-123",
         status: "running",
       }),
     );

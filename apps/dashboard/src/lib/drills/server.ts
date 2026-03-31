@@ -3,9 +3,10 @@ import { createServerFn } from "@tanstack/react-start";
 import { getRequest } from "@tanstack/react-start/server";
 
 import { db } from "#/db";
-import { drillDefinition } from "#/db/schema";
+import { drillDefinition, drillTarget } from "#/db/schema";
 import { auth } from "#/lib/auth";
 import type { AppRole } from "#/lib/auth-flow";
+import { formatTargetSummary } from "#/lib/drills/targets";
 
 import {
   executeDrillAction,
@@ -16,6 +17,7 @@ import {
 
 type ExecuteDrillInput = {
   drillKey: string;
+  targetKey: string;
 };
 
 type SetDisruptiveActionsInput = {
@@ -74,21 +76,100 @@ export const executeDrill = createServerFn({ method: "POST" })
       throw new Error("Unknown drill");
     }
 
+    const targetRow = await db.query.drillTarget.findFirst({
+      where: eq(drillTarget.key, data.targetKey),
+    });
+
+    if (!targetRow) {
+      throw new Error("Unknown target");
+    }
+
     return executeDrillAction({
       drill: {
         blastRadiusSummary: row.blastRadiusSummary,
-        chaosTemplate: row.chaosTemplate as { action: "pod-kill"; mode: "one" },
         enabled: row.enabled,
         id: row.id,
         key: row.key,
-        kind: row.kind as "pod_delete",
+        kind: row.kind as
+          | "node_cordon_drain"
+          | "network_error"
+          | "network_latency"
+          | "pod_delete"
+          | "traffic_spike",
         name: row.name,
         requiresDisruptiveActions: row.requiresDisruptiveActions,
-        targetNamespace: row.targetNamespace,
-        targetSelector: row.targetSelector as Record<string, string>,
+        targetType: row.targetType as "node" | "workload",
+        template: row.template as
+          | {
+              action: "pod-kill";
+              executor: "podChaos";
+              mode: "one";
+            }
+          | {
+              action: "delay";
+              correlation: string;
+              executor: "networkChaos";
+              latency: string;
+            }
+          | {
+              action: "loss";
+              correlation: string;
+              executor: "networkChaos";
+              loss: string;
+            }
+          | {
+              deleteEmptyDirData: boolean;
+              executor: "nodeDrain";
+              ignoreDaemonSets: boolean;
+            }
+          | {
+              durationSeconds: number;
+              executor: "loadJob";
+              requestsPerSecond: number;
+            },
       },
       disruptiveActionsEnabled,
       role: session.role,
+      target:
+        targetRow.kind === "node"
+          ? {
+              blastRadiusSummary: targetRow.blastRadiusSummary,
+              enabled: targetRow.enabled,
+              id: targetRow.id,
+              key: targetRow.key,
+              kind: "node",
+              name: targetRow.name,
+              namespace: null,
+              nodeName: targetRow.nodeName ?? targetRow.key,
+              selector: null,
+              serviceName: null,
+              targetSummary: `node/${targetRow.nodeName ?? targetRow.key}`,
+            }
+          : {
+              blastRadiusSummary: targetRow.blastRadiusSummary,
+              enabled: targetRow.enabled,
+              id: targetRow.id,
+              key: targetRow.key,
+              kind: "workload",
+              name: targetRow.name,
+              namespace: targetRow.namespace ?? "",
+              nodeName: null,
+              selector: (targetRow.selector ?? {}) as Record<string, string>,
+              serviceName: targetRow.serviceName,
+              targetSummary: formatTargetSummary({
+                blastRadiusSummary: targetRow.blastRadiusSummary,
+                enabled: targetRow.enabled,
+                id: targetRow.id,
+                key: targetRow.key,
+                kind: "workload",
+                name: targetRow.name,
+                namespace: targetRow.namespace ?? "",
+                nodeName: null,
+                selector: (targetRow.selector ?? {}) as Record<string, string>,
+                serviceName: targetRow.serviceName,
+                targetSummary: `${targetRow.namespace}/${targetRow.key}`,
+              }),
+            },
       user: session.user,
     });
   });

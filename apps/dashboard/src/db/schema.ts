@@ -94,9 +94,13 @@ export const drillDefinition = pgTable(
     requiresDisruptiveActions: boolean("requires_disruptive_actions")
       .default(true)
       .notNull(),
+    targetType: text("target_type", { enum: ["workload", "node"] })
+      .default("workload")
+      .notNull(),
     targetNamespace: text("target_namespace").notNull(),
     targetSelector: jsonb("target_selector").notNull(),
     blastRadiusSummary: text("blast_radius_summary").notNull(),
+    template: jsonb("template").default({}).notNull(),
     chaosTemplate: jsonb("chaos_template").notNull(),
     createdAt: timestamp("created_at").defaultNow().notNull(),
     updatedAt: timestamp("updated_at")
@@ -107,6 +111,28 @@ export const drillDefinition = pgTable(
   (table) => [index("drill_definition_key_idx").on(table.key)]
 );
 
+export const drillTarget = pgTable(
+  "drill_target",
+  {
+    id: text("id").primaryKey(),
+    key: text("key").notNull().unique(),
+    name: text("name").notNull(),
+    kind: text("kind", { enum: ["workload", "node"] }).notNull(),
+    namespace: text("namespace"),
+    serviceName: text("service_name"),
+    selector: jsonb("selector"),
+    nodeName: text("node_name"),
+    blastRadiusSummary: text("blast_radius_summary").notNull(),
+    enabled: boolean("enabled").default(true).notNull(),
+    createdAt: timestamp("created_at").defaultNow().notNull(),
+    updatedAt: timestamp("updated_at")
+      .defaultNow()
+      .$onUpdate(() => /* @__PURE__ */ new Date())
+      .notNull(),
+  },
+  (table) => [index("drill_target_key_idx").on(table.key)]
+);
+
 export const drillRun = pgTable(
   "drill_run",
   {
@@ -114,9 +140,14 @@ export const drillRun = pgTable(
     drillDefinitionId: text("drill_definition_id")
       .notNull()
       .references(() => drillDefinition.id, { onDelete: "restrict" }),
+    drillTargetId: text("drill_target_id")
+      .notNull()
+      .references(() => drillTarget.id, { onDelete: "restrict" }),
     requestedByUserId: text("requested_by_user_id")
       .notNull()
       .references(() => user.id, { onDelete: "restrict" }),
+    drillKey: text("drill_key").notNull(),
+    targetKey: text("target_key").notNull(),
     status: text("status").notNull(),
     targetSummary: text("target_summary").notNull(),
     chaosNamespace: text("chaos_namespace"),
@@ -128,6 +159,7 @@ export const drillRun = pgTable(
   },
   (table) => [
     index("drill_run_definition_idx").on(table.drillDefinitionId),
+    index("drill_run_target_idx").on(table.drillTargetId),
     index("drill_run_requested_by_idx").on(table.requestedByUserId),
     index("drill_run_status_idx").on(table.status),
   ]
@@ -189,10 +221,18 @@ export const drillDefinitionRelations = relations(
   })
 );
 
+export const drillTargetRelations = relations(drillTarget, ({ many }) => ({
+  runs: many(drillRun),
+}));
+
 export const drillRunRelations = relations(drillRun, ({ one }) => ({
   drillDefinition: one(drillDefinition, {
     fields: [drillRun.drillDefinitionId],
     references: [drillDefinition.id],
+  }),
+  drillTarget: one(drillTarget, {
+    fields: [drillRun.drillTargetId],
+    references: [drillTarget.id],
   }),
   requestedByUser: one(user, {
     fields: [drillRun.requestedByUserId],

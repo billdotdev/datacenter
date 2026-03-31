@@ -6,17 +6,29 @@ import {
   auditLog,
   drillDefinition,
   drillRun,
+  drillTarget,
   user,
 } from "#/db/schema";
 import type { AppRole } from "#/lib/auth-flow";
 
-import { buildPodChaosManifest, createPodChaos, getPodChaos } from "./chaos-client";
+import {
+  buildNetworkChaosManifest,
+  buildPodChaosManifest,
+  createNetworkChaos,
+  createPodChaos,
+  getNetworkChaos,
+  getPodChaos,
+} from "./chaos-client";
+import { buildLoadJobManifest, createLoadJob } from "./load-job-client";
 import type {
   DrillCatalogView,
   DrillDefinitionRecord,
   DrillRunStatus,
+  DrillTargetRecord,
 } from "./models";
-import { canExecuteDrill } from "./policy";
+import { canExecuteDrill, isTargetCompatibleWithDrill } from "./policy";
+import { cordonAndDrainNode } from "./node-client";
+import { formatTargetSummary } from "./targets";
 
 function createId(prefix: string) {
   return `${prefix}-${crypto.randomUUID()}`;
@@ -38,15 +50,46 @@ function toRunStatus(value: string): DrillRunStatus {
 function toDefinitionRecord(row: typeof drillDefinition.$inferSelect): DrillDefinitionRecord {
   return {
     blastRadiusSummary: row.blastRadiusSummary,
-    chaosTemplate: row.chaosTemplate as DrillDefinitionRecord["chaosTemplate"],
     enabled: row.enabled,
     id: row.id,
     key: row.key,
     kind: row.kind as DrillDefinitionRecord["kind"],
     name: row.name,
     requiresDisruptiveActions: row.requiresDisruptiveActions,
-    targetNamespace: row.targetNamespace,
-    targetSelector: row.targetSelector as Record<string, string>,
+    targetType: row.targetType as DrillDefinitionRecord["targetType"],
+    template: row.template as DrillDefinitionRecord["template"],
+  };
+}
+
+function toTargetRecord(row: typeof drillTarget.$inferSelect): DrillTargetRecord {
+  if (row.kind === "node") {
+    return {
+      blastRadiusSummary: row.blastRadiusSummary,
+      enabled: row.enabled,
+      id: row.id,
+      key: row.key,
+      kind: "node",
+      name: row.name,
+      namespace: null,
+      nodeName: row.nodeName ?? row.key,
+      selector: null,
+      serviceName: null,
+      targetSummary: `node/${row.nodeName ?? row.key}`,
+    };
+  }
+
+  return {
+    blastRadiusSummary: row.blastRadiusSummary,
+    enabled: row.enabled,
+    id: row.id,
+    key: row.key,
+    kind: "workload",
+    name: row.name,
+    namespace: row.namespace ?? "",
+    nodeName: null,
+    selector: (row.selector ?? {}) as Record<string, string>,
+    serviceName: row.serviceName,
+    targetSummary: `${row.namespace}/${row.key}`,
   };
 }
 
@@ -111,14 +154,16 @@ export async function readDisruptiveActionsEnabled() {
 
 export async function readDrillCatalogData(input?: {
   listDefinitions?: () => Promise<DrillDefinitionRecord[]>;
+  listTargets?: () => Promise<DrillTargetRecord[]>;
   listRuns?: () => Promise<DrillCatalogView["runs"]>;
   readDisruptiveActionsEnabled?: () => Promise<boolean>;
   reconcileRunStatuses?: () => Promise<void>;
 }) {
   await (input?.reconcileRunStatuses ?? reconcileRunStatuses)();
 
-  const [definitions, runs, disruptiveActionsEnabled] = await Promise.all([
+  const [definitions, targets, runs, disruptiveActionsEnabled] = await Promise.all([
     (input?.listDefinitions ?? listDrillDefinitions)(),
+    (input?.listTargets ?? listDrillTargets)(),
     (input?.listRuns ?? listRecentRuns)(),
     (input?.readDisruptiveActionsEnabled ?? readDisruptiveActionsEnabled)(),
   ]);
@@ -131,13 +176,23 @@ export async function readDrillCatalogData(input?: {
       key: definition.key,
       kind: definition.kind,
       name: definition.name,
-      targetSummary: `${definition.targetNamespace}/${definition.targetSelector["app.kubernetes.io/name"]}`,
+      targets: targets
+        .filter((target) => isTargetCompatibleWithDrill(definition, target))
+        .map((target) => ({
+          blastRadiusSummary: target.blastRadiusSummary,
+          key: target.key,
+          name: target.name,
+          targetSummary: target.targetSummary,
+        })),
     })),
     runs,
   } satisfies DrillCatalogView;
 }
 
 export async function executeDrillAction(input: {
+  cordonAndDrainNode?: typeof cordonAndDrainNode;
+  createLoadJob?: typeof createLoadJob;
+  createNetworkChaos?: typeof createNetworkChaos;
   createPodChaos?: typeof createPodChaos;
   drill: DrillDefinitionRecord;
   disruptiveActionsEnabled: boolean;
@@ -145,6 +200,7 @@ export async function executeDrillAction(input: {
   insertRun?: typeof insertRun;
   now?: () => Date;
   role: AppRole;
+  target: DrillTargetRecord;
   updateRun?: typeof updateRun;
   user: { id: string; name: string };
 }) {
@@ -152,6 +208,7 @@ export async function executeDrillAction(input: {
     disruptiveActionsEnabled: input.disruptiveActionsEnabled,
     drill: input.drill,
     role: input.role,
+    target: input.target,
   });
 
   if (!decision.allow) {
@@ -161,6 +218,8 @@ export async function executeDrillAction(input: {
       payload: {
         drillKey: input.drill.key,
         reason: decision.reason,
+        targetKey: input.target.key,
+        targetSummary: input.target.targetSummary,
       },
       subjectId: input.drill.id,
       subjectType: "drill_definition",
@@ -172,10 +231,13 @@ export async function executeDrillAction(input: {
   const requestedAt = (input.now ?? (() => new Date()))().toISOString();
   const run = await (input.insertRun ?? insertRun)({
     drillDefinitionId: input.drill.id,
+    drillKey: input.drill.key,
+    drillTargetId: input.target.id,
     requestedAt,
     requestedByUserId: input.user.id,
     status: "pending",
-    targetSummary: `${input.drill.targetNamespace}/${input.drill.targetSelector["app.kubernetes.io/name"]}`,
+    targetKey: input.target.key,
+    targetSummary: input.target.targetSummary,
   });
 
   await (input.insertAuditEvent ?? insertAuditEvent)({
@@ -184,26 +246,72 @@ export async function executeDrillAction(input: {
     payload: {
       drillKey: input.drill.key,
       runId: run.id,
+      targetKey: input.target.key,
+      targetSummary: input.target.targetSummary,
     },
     subjectId: run.id,
     subjectType: "drill_run",
   });
 
-  const manifest = buildPodChaosManifest({
-    drill: input.drill,
-    requestedByUserId: input.user.id,
-    runId: run.id,
-  });
-
   try {
-    await (input.createPodChaos ?? createPodChaos)(manifest);
+    if (input.drill.template.executor === "podChaos") {
+      const manifest = buildPodChaosManifest({
+        drill: input.drill,
+        requestedByUserId: input.user.id,
+        runId: run.id,
+        target: input.target,
+      });
 
-    await (input.updateRun ?? updateRun)(run.id, {
-      chaosName: manifest.metadata.name,
-      chaosNamespace: manifest.metadata.namespace,
-      startedAt: requestedAt,
-      status: "running",
-    });
+      await (input.createPodChaos ?? createPodChaos)(manifest);
+
+      await (input.updateRun ?? updateRun)(run.id, {
+        chaosName: manifest.metadata.name,
+        chaosNamespace: manifest.metadata.namespace,
+        startedAt: requestedAt,
+        status: "running",
+      });
+    } else if (input.drill.template.executor === "networkChaos") {
+      const manifest = buildNetworkChaosManifest({
+        drill: input.drill,
+        requestedByUserId: input.user.id,
+        runId: run.id,
+        target: input.target,
+      });
+
+      await (input.createNetworkChaos ?? createNetworkChaos)(manifest);
+
+      await (input.updateRun ?? updateRun)(run.id, {
+        chaosName: manifest.metadata.name,
+        chaosNamespace: manifest.metadata.namespace,
+        startedAt: requestedAt,
+        status: "running",
+      });
+    } else if (input.drill.template.executor === "loadJob") {
+      const manifest = buildLoadJobManifest({
+        drill: input.drill,
+        runId: run.id,
+        target: input.target,
+      });
+
+      await (input.createLoadJob ?? createLoadJob)(manifest);
+
+      await (input.updateRun ?? updateRun)(run.id, {
+        chaosName: manifest.metadata?.name ?? null,
+        chaosNamespace: manifest.metadata?.namespace ?? null,
+        startedAt: requestedAt,
+        status: "running",
+      });
+    } else {
+      await (input.cordonAndDrainNode ?? cordonAndDrainNode)({
+        nodeName: input.target.kind === "node" ? input.target.nodeName : input.target.key,
+      });
+
+      await (input.updateRun ?? updateRun)(run.id, {
+        finishedAt: requestedAt,
+        startedAt: requestedAt,
+        status: "succeeded",
+      });
+    }
 
     await (input.insertAuditEvent ?? insertAuditEvent)({
       actorUserId: input.user.id,
@@ -211,6 +319,8 @@ export async function executeDrillAction(input: {
       payload: {
         drillKey: input.drill.key,
         runId: run.id,
+        targetKey: input.target.key,
+        targetSummary: input.target.targetSummary,
       },
       subjectId: run.id,
       subjectType: "drill_run",
@@ -218,7 +328,7 @@ export async function executeDrillAction(input: {
 
     return {
       id: run.id,
-      status: "running" as const,
+      status: input.drill.template.executor === "nodeDrain" ? ("succeeded" as const) : ("running" as const),
     };
   } catch (error) {
     const message =
@@ -237,6 +347,8 @@ export async function executeDrillAction(input: {
         drillKey: input.drill.key,
         message,
         runId: run.id,
+        targetKey: input.target.key,
+        targetSummary: input.target.targetSummary,
       },
       subjectId: run.id,
       subjectType: "drill_run",
@@ -275,6 +387,11 @@ async function listDrillDefinitions(): Promise<DrillDefinitionRecord[]> {
   return rows.map(toDefinitionRecord);
 }
 
+async function listDrillTargets(): Promise<DrillTargetRecord[]> {
+  const rows = await db.select().from(drillTarget);
+  return rows.map(toTargetRecord);
+}
+
 async function listRecentRuns() {
   const rows = await db
     .select({
@@ -306,19 +423,25 @@ async function listRecentRuns() {
 
 async function insertRun(input: {
   drillDefinitionId: string;
+  drillKey: string;
+  drillTargetId: string;
   requestedAt: string;
   requestedByUserId: string;
   status: string;
+  targetKey: string;
   targetSummary: string;
 }) {
   const id = createId("run");
 
   await db.insert(drillRun).values({
     drillDefinitionId: input.drillDefinitionId,
+    drillKey: input.drillKey,
+    drillTargetId: input.drillTargetId,
     id,
     requestedAt: new Date(input.requestedAt),
     requestedByUserId: input.requestedByUserId,
     status: input.status,
+    targetKey: input.targetKey,
     targetSummary: input.targetSummary,
   });
 
@@ -392,7 +515,9 @@ async function reconcileRunStatuses() {
         return;
       }
 
-      const object = (await getPodChaos(row.chaosName)) as PodChaosLike;
+      const object = (row.drillKey === "network-latency" || row.drillKey === "network-error"
+        ? await getNetworkChaos(row.chaosName)
+        : await getPodChaos(row.chaosName)) as PodChaosLike;
       const nextStatus = reconcileRunStatusFromObject(object);
 
       if (nextStatus.status === "succeeded") {
@@ -403,7 +528,7 @@ async function reconcileRunStatuses() {
         await insertAuditEvent({
           actorUserId: row.requestedByUserId,
           eventType: "drill.execution.completed",
-          payload: { runId: row.id },
+          payload: { drillKey: row.drillKey, runId: row.id, targetKey: row.targetKey, targetSummary: row.targetSummary },
           subjectId: row.id,
           subjectType: "drill_run",
         });
@@ -416,7 +541,7 @@ async function reconcileRunStatuses() {
         await insertAuditEvent({
           actorUserId: row.requestedByUserId,
           eventType: "drill.execution.failed",
-          payload: { runId: row.id },
+          payload: { drillKey: row.drillKey, runId: row.id, targetKey: row.targetKey, targetSummary: row.targetSummary },
           subjectId: row.id,
           subjectType: "drill_run",
         });

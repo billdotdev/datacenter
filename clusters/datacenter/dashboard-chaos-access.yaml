@@ -8,10 +8,14 @@ rules:
       - chaos-mesh.org
     resources:
       - podchaos
+      - networkchaos
     verbs:
       - create
+      - delete
       - get
       - list
+      - patch
+      - update
       - watch
 ---
 apiVersion: rbac.authorization.k8s.io/v1
@@ -29,42 +33,54 @@ subjects:
     namespace: dashboard
 ---
 apiVersion: rbac.authorization.k8s.io/v1
-kind: Role
+kind: ClusterRole
 metadata:
-  name: dashboard-chaos-target-reader
-  namespace: dashboard
+  name: dashboard-drill-operator
 rules:
   - apiGroups:
       - ""
     resources:
-      - pods
       - namespaces
+      - pods
     verbs:
       - get
       - list
       - watch
   - apiGroups:
-      - chaos-mesh.org
+      - ""
     resources:
-      - '*'
+      - pods/eviction
     verbs:
       - create
-      - delete
+  - apiGroups:
+      - ""
+    resources:
+      - nodes
+    verbs:
       - get
       - list
       - patch
       - update
       - watch
+  - apiGroups:
+      - batch
+    resources:
+      - jobs
+    verbs:
+      - create
+      - delete
+      - get
+      - list
+      - watch
 ---
 apiVersion: rbac.authorization.k8s.io/v1
-kind: RoleBinding
+kind: ClusterRoleBinding
 metadata:
-  name: dashboard-chaos-target-reader
-  namespace: dashboard
+  name: dashboard-drill-operator
 roleRef:
   apiGroup: rbac.authorization.k8s.io
-  kind: Role
-  name: dashboard-chaos-target-reader
+  kind: ClusterRole
+  name: dashboard-drill-operator
 subjects:
   - kind: ServiceAccount
     name: dashboard

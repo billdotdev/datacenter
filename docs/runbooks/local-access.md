@@ -69,13 +69,16 @@ After syncing the latest image, verify:
 ```bash
 kubectl -n dashboard rollout status deployment/dashboard
 kubectl -n chaos-mesh get rolebinding dashboard-chaos-runner
-kubectl -n chaos-mesh get podchaos
+kubectl get clusterrole dashboard-drill-operator
+kubectl -n chaos-mesh get podchaos,networkchaos
 ```
 
 Open `https://dashboard.datacenter.lan/drills` and confirm:
 
-- the `pod-delete-dashboard` card renders
+- the `pod-delete`, `traffic-spike`, `network-latency`, `network-error`, and `node-cordon-drain` cards render
+- target dropdowns render with allowlisted targets only
+- `cp-3` is the only node target
 - `viewer` cannot execute
 - `operator` or `admin` can execute when disruptive actions are enabled
 - a new run row appears after execution
-- a `PodChaos` object appears in namespace `chaos-mesh`
+- a `PodChaos` or `NetworkChaos` object appears in namespace `chaos-mesh` for chaos-backed drills

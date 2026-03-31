@@ -15,10 +15,17 @@ describe("DrillCatalog", () => {
             {
               blastRadiusSummary: "Restarts one dashboard pod in namespace dashboard.",
               enabled: true,
-              key: "pod-delete-dashboard",
+              key: "pod-delete",
               kind: "pod_delete",
-              name: "Delete One Dashboard Pod",
-              targetSummary: "dashboard/dashboard",
+              name: "Delete One Pod",
+              targets: [
+                {
+                  blastRadiusSummary: "Affects the dashboard service only.",
+                  key: "dashboard",
+                  name: "Dashboard",
+                  targetSummary: "dashboard/dashboard",
+                },
+              ],
             },
           ],
           runs: [
@@ -43,7 +50,7 @@ describe("DrillCatalog", () => {
       />,
     );
 
-    expect(screen.getByText("Delete One Dashboard Pod")).toBeTruthy();
+    expect(screen.getByText("Delete One Pod")).toBeTruthy();
     expect(
       (screen.getByRole("button", { name: "Execute drill" }) as HTMLButtonElement)
         .disabled,
@@ -64,10 +71,23 @@ describe("DrillCatalog", () => {
             {
               blastRadiusSummary: "Restarts one dashboard pod in namespace dashboard.",
               enabled: true,
-              key: "pod-delete-dashboard",
+              key: "pod-delete",
               kind: "pod_delete",
-              name: "Delete One Dashboard Pod",
-              targetSummary: "dashboard/dashboard",
+              name: "Delete One Pod",
+              targets: [
+                {
+                  blastRadiusSummary: "Affects the dashboard service only.",
+                  key: "dashboard",
+                  name: "Dashboard",
+                  targetSummary: "dashboard/dashboard",
+                },
+                {
+                  blastRadiusSummary: "Affects Loki only.",
+                  key: "loki",
+                  name: "Loki",
+                  targetSummary: "observability/loki",
+                },
+              ],
             },
           ],
           runs: [],
@@ -81,7 +101,10 @@ describe("DrillCatalog", () => {
       />,
     );
 
+    fireEvent.change(screen.getByLabelText("Target for Delete One Pod"), {
+      target: { value: "loki" },
+    });
     fireEvent.click(screen.getByRole("button", { name: "Execute drill" }));
-    expect(onExecute).toHaveBeenCalledWith("pod-delete-dashboard");
+    expect(onExecute).toHaveBeenCalledWith("pod-delete", "loki");
   });
 });
