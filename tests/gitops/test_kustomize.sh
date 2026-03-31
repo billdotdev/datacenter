@@ -19,6 +19,8 @@ test -f platform/gitops/argocd/bootstrap/argocd-dex-server-resources.yaml
 test -f platform/gitops/argocd/bootstrap/argocd-redis-resources.yaml
 test -f platform/gitops/argocd/bootstrap/argocd-repo-server-hardening.yaml
 test -f platform/gitops/argocd/access/kustomization.yaml
+test -f platform/gitops/argocd/access/argocd-cmd-params-cm-server-insecure.yaml
+test -f platform/gitops/argocd/access/argocd-server-httproute.yaml
 
 assert_contains platform/gitops/argocd/bootstrap/kustomization.yaml 'namespace: argocd'
 assert_contains platform/gitops/argocd/bootstrap/kustomization.yaml 'namespace.yaml'
@@ -58,5 +60,7 @@ assert_contains platform/gitops/argocd/bootstrap/argocd-repo-server-hardening.ya
 assert_contains platform/gitops/argocd/access/kustomization.yaml 'namespace: argocd'
 assert_contains platform/gitops/argocd/access/kustomization.yaml 'argocd-cmd-params-cm-server-insecure.yaml'
 assert_contains platform/gitops/argocd/access/kustomization.yaml 'argocd-server-httproute.yaml'
+assert_contains platform/gitops/argocd/access/argocd-cmd-params-cm-server-insecure.yaml 'server.insecure: "true"'
+assert_contains platform/gitops/argocd/access/argocd-server-httproute.yaml 'argocd.datacenter.lan'
 
 kubectl kustomize clusters/datacenter >/dev/null
