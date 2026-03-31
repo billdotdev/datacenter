@@ -49,7 +49,19 @@ write path.
 
 Current drill slice:
 
-- one seeded drill: `pod-delete-dashboard`
+- allowlisted target selection by `targetKey`
+- drill catalog:
+  - `pod-delete`
+  - `traffic-spike`
+  - `network-latency`
+  - `network-error`
+  - `node-cordon-drain`
+- seeded targets:
+  - `dashboard`
+  - `istiod`
+  - `datacenter-postgres`
+  - `loki`
+  - `cp-3`
 - `viewer` can read catalog and run history only
 - `operator` and `admin` can execute when disruptive actions are enabled
 - `admin` can toggle the global disruptive actions safety gate
@@ -57,8 +69,10 @@ Current drill slice:
 Execution backend:
 
 - app-owned PostgreSQL drill definitions, runs, and audit log
-- backend-created Chaos Mesh `PodChaos`
-- fixed allowlist target: dashboard pods in namespace `dashboard`
+- backend-created Chaos Mesh `PodChaos` and `NetworkChaos`
+- backend-created Kubernetes `Job` for traffic spike
+- exact-node drain support for `cp-3`
+- fixed code-owned target allowlist; no raw namespace, selector, service, or node input
 
 ## Build and test
 

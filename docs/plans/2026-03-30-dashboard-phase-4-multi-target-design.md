@@ -134,7 +134,8 @@ Initial workload targets:
 
 Initial node targets:
 
-- one exact worker node, seeded from code once the node name is confirmed
+- one exact seeded node: `cp-3`
+- note: this cluster currently has no worker-only nodes; `cp-3` is a control-plane-plus-worker node selected explicitly for this phase
 
 ### `drill_run`
 
@@ -185,7 +186,14 @@ Selected workload targets for this phase:
 - `database/datacenter-postgres`
 - `observability/loki`
 
-Implementation must begin by verifying the live selectors for these workloads and then seeding only the verified selector values into the allowlist migration.
+Verified live selectors for this phase:
+
+- `dashboard`: `{"app.kubernetes.io/name":"dashboard"}`
+- `istiod`: `{"app.kubernetes.io/name":"istiod"}`
+- `datacenter-postgres`: `{"cnpg.io/cluster":"datacenter-postgres"}`
+- `loki`: `{"app.kubernetes.io/name":"loki","app.kubernetes.io/component":"single-binary"}`
+
+Implementation must seed only these verified selector values into the allowlist migration.
 
 ### Node Targets
 
@@ -195,7 +203,7 @@ Rules:
 
 - no label-based node selection
 - no random node choice at runtime
-- one exact allowlisted worker node in this phase
+- one exact allowlisted node in this phase: `cp-3`
 
 ## Drill Kinds
 

@@ -41,7 +41,8 @@ function DrillsPage() {
   });
 
   const executeMutation = useMutation({
-    mutationFn: (drillKey: string) => executeDrill({ data: { drillKey } }),
+    mutationFn: (input: { drillKey: string; targetKey: string }) =>
+      executeDrill({ data: input }),
     onError: (mutationError) => {
       setError(
         mutationError instanceof Error
@@ -77,7 +78,9 @@ function DrillsPage() {
         data={query.data}
         error={error}
         isRefreshing={query.isFetching}
-        onExecute={(drillKey) => executeMutation.mutate(drillKey)}
+        onExecute={(drillKey, targetKey) =>
+          executeMutation.mutate({ drillKey, targetKey })
+        }
         onToggleSafety={(enabled) => toggleMutation.mutate(enabled)}
         role={initialData.session?.user.role ?? "viewer"}
         toggleBusy={toggleMutation.isPending}
