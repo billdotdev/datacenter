@@ -1,4 +1,5 @@
 .terraform
+.superpowers/
 *.env
 *.tfvars
 *.tfstate*
