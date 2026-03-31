@@ -218,8 +218,19 @@ assert_contains platform/data/cloudnative-pg/operator/operator-config-patch.yaml
 assert_contains clusters/datacenter/platform/kube-prometheus-stack.yaml '$values/platform/observability/kube-prometheus-stack/values.yaml'
 assert_contains clusters/datacenter/platform/kube-prometheus-stack.yaml 'ServerSideApply=true'
 test -f platform/observability/kube-prometheus-stack/values.yaml
+test -f platform/observability/access/kustomization.yaml
+test -f platform/observability/access/grafana-httproute.yaml
+test -f platform/observability/access/prometheus-httproute.yaml
 assert_contains platform/observability/kube-prometheus-stack/values.yaml 'crds:'
 assert_contains platform/observability/kube-prometheus-stack/values.yaml 'enabled: false'
+assert_contains clusters/datacenter/platform/kube-prometheus-stack.yaml 'path: platform/observability/access'
+assert_contains platform/observability/access/kustomization.yaml 'namespace: observability'
+assert_contains platform/observability/access/kustomization.yaml 'grafana-httproute.yaml'
+assert_contains platform/observability/access/kustomization.yaml 'prometheus-httproute.yaml'
+assert_contains platform/observability/access/grafana-httproute.yaml 'grafana.datacenter.lan'
+assert_contains platform/observability/access/grafana-httproute.yaml 'kube-prometheus-stack-grafana'
+assert_contains platform/observability/access/prometheus-httproute.yaml 'prometheus.datacenter.lan'
+assert_contains platform/observability/access/prometheus-httproute.yaml 'kube-prometheus-stack-prometheus'
 
 assert_contains clusters/datacenter/platform/prometheus-operator-crds.yaml 'chart: prometheus-operator-crds'
 assert_contains clusters/datacenter/platform/prometheus-operator-crds.yaml 'targetRevision: 25.0.0'
@@ -298,6 +309,7 @@ assert_contains clusters/datacenter/platform/promtail.yaml 'argocd.argoproj.io/s
 
 kubectl kustomize clusters/datacenter >/dev/null
 kubectl kustomize clusters/datacenter/platform >/dev/null
+kubectl kustomize platform/observability/access >/dev/null
 kubectl kustomize platform/network/metallb/config >/dev/null
 kubectl kustomize platform/security/gateway-api/shared-gateway >/dev/null
 kubectl kustomize platform/security/internal-tls >/dev/null

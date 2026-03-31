@@ -4,7 +4,12 @@ namespace: argocd
 resources:
   - namespace.yaml
   - https://raw.githubusercontent.com/argoproj/argo-cd/stable/manifests/install.yaml
+  - argocd-server-httproute.yaml
 patches:
+  - path: argocd-cmd-params-cm-server-insecure.yaml
+    target:
+      kind: ConfigMap
+      name: argocd-cmd-params-cm
   - path: argocd-cm-application-health.yaml
     target:
       kind: ConfigMap
