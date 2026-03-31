@@ -20,7 +20,7 @@ export const user = pgTable("user", {
     .$onUpdate(() => /* @__PURE__ */ new Date())
     .notNull(),
   role: text("role", { enum: ["admin", "operator", "viewer"] }).default(
-    "viewer"
+    "viewer",
   ),
 });
 
@@ -40,7 +40,7 @@ export const session = pgTable(
       .notNull()
       .references(() => user.id, { onDelete: "cascade" }),
   },
-  (table) => [index("session_userId_idx").on(table.userId)]
+  (table) => [index("session_userId_idx").on(table.userId)],
 );
 
 export const account = pgTable(
@@ -64,7 +64,7 @@ export const account = pgTable(
       .$onUpdate(() => /* @__PURE__ */ new Date())
       .notNull(),
   },
-  (table) => [index("account_userId_idx").on(table.userId)]
+  (table) => [index("account_userId_idx").on(table.userId)],
 );
 
 export const verification = pgTable(
@@ -80,7 +80,7 @@ export const verification = pgTable(
       .$onUpdate(() => /* @__PURE__ */ new Date())
       .notNull(),
   },
-  (table) => [index("verification_identifier_idx").on(table.identifier)]
+  (table) => [index("verification_identifier_idx").on(table.identifier)],
 );
 
 export const drillDefinition = pgTable(
@@ -108,7 +108,7 @@ export const drillDefinition = pgTable(
       .$onUpdate(() => /* @__PURE__ */ new Date())
       .notNull(),
   },
-  (table) => [index("drill_definition_key_idx").on(table.key)]
+  (table) => [index("drill_definition_key_idx").on(table.key)],
 );
 
 export const drillTarget = pgTable(
@@ -130,7 +130,7 @@ export const drillTarget = pgTable(
       .$onUpdate(() => /* @__PURE__ */ new Date())
       .notNull(),
   },
-  (table) => [index("drill_target_key_idx").on(table.key)]
+  (table) => [index("drill_target_key_idx").on(table.key)],
 );
 
 export const drillRun = pgTable(
@@ -162,7 +162,7 @@ export const drillRun = pgTable(
     index("drill_run_target_idx").on(table.drillTargetId),
     index("drill_run_requested_by_idx").on(table.requestedByUserId),
     index("drill_run_status_idx").on(table.status),
-  ]
+  ],
 );
 
 export const auditLog = pgTable(
@@ -181,7 +181,7 @@ export const auditLog = pgTable(
   (table) => [
     index("audit_log_event_type_idx").on(table.eventType),
     index("audit_log_actor_idx").on(table.actorUserId),
-  ]
+  ],
 );
 
 export const appConfig = pgTable("app_config", {
@@ -218,7 +218,7 @@ export const drillDefinitionRelations = relations(
   drillDefinition,
   ({ many }) => ({
     runs: many(drillRun),
-  })
+  }),
 );
 
 export const drillTargetRelations = relations(drillTarget, ({ many }) => ({

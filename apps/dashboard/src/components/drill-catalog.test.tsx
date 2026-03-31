@@ -6,14 +6,14 @@ import { describe, expect, it, vi } from "vitest";
 import { DrillCatalog } from "./drill-catalog";
 
 describe("DrillCatalog", () => {
-  it("disables execute for viewers and shows recent runs", () => {
+  it("disables execute for viewers and shows drill + target in recent runs", () => {
     render(
       <DrillCatalog
         data={{
           disruptiveActionsEnabled: false,
           drills: [
             {
-              blastRadiusSummary: "Restarts one dashboard pod in namespace dashboard.",
+              blastRadiusSummary: "Restarts one approved workload pod.",
               enabled: true,
               key: "pod-delete",
               kind: "pod_delete",
@@ -30,11 +30,12 @@ describe("DrillCatalog", () => {
           ],
           runs: [
             {
-              chaosName: "dashboard-run-123",
+              chaosName: "pod-delete-run-123",
+              drillKey: "pod-delete",
               errorMessage: null,
               finishedAt: null,
               id: "run-123",
-              requestedAt: "2026-03-30T12:00:00.000Z",
+              requestedAt: "2026-03-31T12:00:00.000Z",
               requestedByName: "Op User",
               status: "running",
               targetSummary: "dashboard/dashboard",
@@ -56,9 +57,11 @@ describe("DrillCatalog", () => {
         .disabled,
     ).toBe(true);
     expect(screen.getByText("Op User")).toBeTruthy();
+    expect(screen.getByText("pod-delete")).toBeTruthy();
+    expect(screen.getAllByText("dashboard/dashboard").length).toBeGreaterThan(0);
   });
 
-  it("executes after confirmation for operators", () => {
+  it("executes selected target for operators", () => {
     const onExecute = vi.fn();
     vi.stubGlobal("confirm", vi.fn(() => true));
     cleanup();
@@ -69,7 +72,7 @@ describe("DrillCatalog", () => {
           disruptiveActionsEnabled: true,
           drills: [
             {
-              blastRadiusSummary: "Restarts one dashboard pod in namespace dashboard.",
+              blastRadiusSummary: "Restarts one approved workload pod.",
               enabled: true,
               key: "pod-delete",
               kind: "pod_delete",
@@ -82,7 +85,7 @@ describe("DrillCatalog", () => {
                   targetSummary: "dashboard/dashboard",
                 },
                 {
-                  blastRadiusSummary: "Affects Loki only.",
+                  blastRadiusSummary: "Affects the Loki single-binary workload.",
                   key: "loki",
                   name: "Loki",
                   targetSummary: "observability/loki",

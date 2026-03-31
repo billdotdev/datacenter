@@ -79,7 +79,7 @@ INSERT INTO "drill_definition" (
 	'drill-network-error',
 	'network-error',
 	'Inject Network Error',
-	'network-error',
+	'network_error',
 	true,
 	true,
 	'workload',

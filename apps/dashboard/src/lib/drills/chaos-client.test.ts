@@ -93,7 +93,7 @@ describe("buildNetworkChaosManifest", () => {
       nodeName: null,
       selector: {
         "app.kubernetes.io/component": "single-binary",
-        "app.kubernetes.io/name": "loki",
+        "app.kubernetes.io/instance": "loki",
       },
       serviceName: "loki-gateway",
       targetSummary: "observability/loki",
@@ -123,7 +123,7 @@ describe("buildNetworkChaosManifest", () => {
         selector: {
           labelSelectors: {
             "app.kubernetes.io/component": "single-binary",
-            "app.kubernetes.io/name": "loki",
+            "app.kubernetes.io/instance": "loki",
           },
           namespaces: ["observability"],
         },

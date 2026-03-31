@@ -28,7 +28,6 @@ import type {
 } from "./models";
 import { canExecuteDrill, isTargetCompatibleWithDrill } from "./policy";
 import { cordonAndDrainNode } from "./node-client";
-import { formatTargetSummary } from "./targets";
 
 function createId(prefix: string) {
   return `${prefix}-${crypto.randomUUID()}`;
@@ -47,7 +46,9 @@ function toRunStatus(value: string): DrillRunStatus {
   return "pending";
 }
 
-function toDefinitionRecord(row: typeof drillDefinition.$inferSelect): DrillDefinitionRecord {
+function toDefinitionRecord(
+  row: typeof drillDefinition.$inferSelect,
+): DrillDefinitionRecord {
   return {
     blastRadiusSummary: row.blastRadiusSummary,
     enabled: row.enabled,
@@ -130,7 +131,6 @@ export function reconcileRunStatusFromObject(object: PodChaosLike): {
     };
   }
 
-  // One-shot PodChaos without duration stays in Run after successful injection.
   if (desiredPhase === "Run" && hasCondition("AllInjected", "True")) {
     return {
       errorMessage: null,
@@ -161,12 +161,13 @@ export async function readDrillCatalogData(input?: {
 }) {
   await (input?.reconcileRunStatuses ?? reconcileRunStatuses)();
 
-  const [definitions, targets, runs, disruptiveActionsEnabled] = await Promise.all([
-    (input?.listDefinitions ?? listDrillDefinitions)(),
-    (input?.listTargets ?? listDrillTargets)(),
-    (input?.listRuns ?? listRecentRuns)(),
-    (input?.readDisruptiveActionsEnabled ?? readDisruptiveActionsEnabled)(),
-  ]);
+  const [definitions, targets, runs, disruptiveActionsEnabled] =
+    await Promise.all([
+      (input?.listDefinitions ?? listDrillDefinitions)(),
+      (input?.listTargets ?? listDrillTargets)(),
+      (input?.listRuns ?? listRecentRuns)(),
+      (input?.readDisruptiveActionsEnabled ?? readDisruptiveActionsEnabled)(),
+    ]);
 
   return {
     disruptiveActionsEnabled,
@@ -303,7 +304,8 @@ export async function executeDrillAction(input: {
       });
     } else {
       await (input.cordonAndDrainNode ?? cordonAndDrainNode)({
-        nodeName: input.target.kind === "node" ? input.target.nodeName : input.target.key,
+        nodeName:
+          input.target.kind === "node" ? input.target.nodeName : input.target.key,
       });
 
       await (input.updateRun ?? updateRun)(run.id, {
@@ -328,7 +330,10 @@ export async function executeDrillAction(input: {
 
     return {
       id: run.id,
-      status: input.drill.template.executor === "nodeDrain" ? ("succeeded" as const) : ("running" as const),
+      status:
+        input.drill.template.executor === "nodeDrain"
+          ? ("succeeded" as const)
+          : ("running" as const),
     };
   } catch (error) {
     const message =
@@ -396,6 +401,7 @@ async function listRecentRuns() {
   const rows = await db
     .select({
       chaosName: drillRun.chaosName,
+      drillKey: drillRun.drillKey,
       errorMessage: drillRun.errorMessage,
       finishedAt: drillRun.finishedAt,
       id: drillRun.id,
@@ -411,6 +417,7 @@ async function listRecentRuns() {
 
   return rows.map((row) => ({
     chaosName: row.chaosName,
+    drillKey: row.drillKey,
     errorMessage: row.errorMessage,
     finishedAt: row.finishedAt?.toISOString() ?? null,
     id: row.id,
@@ -454,8 +461,8 @@ async function insertRun(input: {
 async function updateRun(
   id: string,
   patch: Partial<{
-    chaosName: string;
-    chaosNamespace: string;
+    chaosName: string | null;
+    chaosNamespace: string | null;
     errorMessage: string;
     finishedAt: string;
     startedAt: string;
@@ -515,7 +522,8 @@ async function reconcileRunStatuses() {
         return;
       }
 
-      const object = (row.drillKey === "network-latency" || row.drillKey === "network-error"
+      const object = (row.drillKey === "network-latency" ||
+      row.drillKey === "network-error"
         ? await getNetworkChaos(row.chaosName)
         : await getPodChaos(row.chaosName)) as PodChaosLike;
       const nextStatus = reconcileRunStatusFromObject(object);
@@ -528,20 +536,31 @@ async function reconcileRunStatuses() {
         await insertAuditEvent({
           actorUserId: row.requestedByUserId,
           eventType: "drill.execution.completed",
-          payload: { drillKey: row.drillKey, runId: row.id, targetKey: row.targetKey, targetSummary: row.targetSummary },
+          payload: {
+            drillKey: row.drillKey,
+            runId: row.id,
+            targetKey: row.targetKey,
+            targetSummary: row.targetSummary,
+          },
           subjectId: row.id,
           subjectType: "drill_run",
         });
       } else if (nextStatus.status === "failed") {
         await updateRun(row.id, {
-          errorMessage: nextStatus.errorMessage ?? "Chaos Mesh marked the run as failed",
+          errorMessage:
+            nextStatus.errorMessage ?? "Chaos Mesh marked the run as failed",
           finishedAt: new Date().toISOString(),
           status: "failed",
         });
         await insertAuditEvent({
           actorUserId: row.requestedByUserId,
           eventType: "drill.execution.failed",
-          payload: { drillKey: row.drillKey, runId: row.id, targetKey: row.targetKey, targetSummary: row.targetSummary },
+          payload: {
+            drillKey: row.drillKey,
+            runId: row.id,
+            targetKey: row.targetKey,
+            targetSummary: row.targetSummary,
+          },
           subjectId: row.id,
           subjectType: "drill_run",
         });

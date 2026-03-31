@@ -61,6 +61,7 @@ export type DrillDefinitionRecord = {
 
 export type DrillRunView = {
   chaosName: string | null;
+  drillKey: string;
   errorMessage: string | null;
   finishedAt: string | null;
   id: string;

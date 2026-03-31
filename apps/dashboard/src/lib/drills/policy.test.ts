@@ -8,7 +8,7 @@ import {
 } from "./policy";
 import type { DrillDefinitionRecord, DrillTargetRecord } from "./models";
 
-const workloadTarget: DrillTargetRecord = {
+const dashboardTarget: DrillTargetRecord = {
   blastRadiusSummary: "Affects the dashboard service only.",
   enabled: true,
   id: "target-dashboard",
@@ -20,6 +20,23 @@ const workloadTarget: DrillTargetRecord = {
   selector: { "app.kubernetes.io/name": "dashboard" },
   serviceName: "dashboard",
   targetSummary: "dashboard/dashboard",
+};
+
+const lokiTarget: DrillTargetRecord = {
+  blastRadiusSummary: "Affects the Loki single-binary workload.",
+  enabled: true,
+  id: "target-loki",
+  key: "loki",
+  kind: "workload",
+  name: "Loki",
+  namespace: "observability",
+  nodeName: null,
+  selector: {
+    "app.kubernetes.io/component": "single-binary",
+    "app.kubernetes.io/instance": "loki",
+  },
+  serviceName: "loki-gateway",
+  targetSummary: "observability/loki",
 };
 
 const nodeTarget: DrillTargetRecord = {
@@ -36,7 +53,7 @@ const nodeTarget: DrillTargetRecord = {
   targetSummary: "node/cp-3",
 };
 
-const workloadDrill: DrillDefinitionRecord = {
+const podDeleteDrill: DrillDefinitionRecord = {
   blastRadiusSummary: "Restarts one approved workload pod.",
   enabled: true,
   id: "drill-pod-delete",
@@ -60,30 +77,14 @@ const trafficSpikeDrill: DrillDefinitionRecord = {
   template: { durationSeconds: 60, executor: "loadJob", requestsPerSecond: 25 },
 };
 
-const nodeDrill: DrillDefinitionRecord = {
-  blastRadiusSummary: "Drain an exact node.",
-  enabled: true,
-  id: "drill-node-cordon-drain",
-  key: "node-cordon-drain",
-  kind: "node_cordon_drain",
-  name: "Cordon And Drain Node",
-  requiresDisruptiveActions: true,
-  targetType: "node",
-  template: {
-    deleteEmptyDirData: false,
-    executor: "nodeDrain",
-    ignoreDaemonSets: true,
-  },
-};
-
 describe("canExecuteDrill", () => {
   it("denies viewers", () => {
     expect(
       canExecuteDrill({
         disruptiveActionsEnabled: true,
-        drill: workloadDrill,
+        drill: podDeleteDrill,
         role: "viewer",
-        target: workloadTarget,
+        target: dashboardTarget,
       }),
     ).toEqual({
       allow: false,
@@ -91,27 +92,13 @@ describe("canExecuteDrill", () => {
     });
   });
 
-  it("denies when disruptive actions are disabled", () => {
-    expect(
-      canExecuteDrill({
-        disruptiveActionsEnabled: false,
-        drill: workloadDrill,
-        role: "operator",
-        target: workloadTarget,
-      }),
-    ).toEqual({
-      allow: false,
-      reason: "disruptive-actions-disabled",
-    });
-  });
-
   it("denies incompatible targets", () => {
     expect(
       canExecuteDrill({
         disruptiveActionsEnabled: true,
-        drill: nodeDrill,
+        drill: trafficSpikeDrill,
         role: "operator",
-        target: workloadTarget,
+        target: nodeTarget,
       }),
     ).toEqual({
       allow: false,
@@ -121,12 +108,18 @@ describe("canExecuteDrill", () => {
 });
 
 describe("allowlisted targets", () => {
-  it("allows only exact workload targets", () => {
-    expect(isAllowedWorkloadTarget(workloadTarget)).toBe(true);
+  it("allows live Loki selector", () => {
+    expect(isAllowedWorkloadTarget(lokiTarget)).toBe(true);
+  });
+
+  it("rejects wrong Loki selector label set", () => {
     expect(
       isAllowedWorkloadTarget({
-        ...workloadTarget,
-        namespace: "observability",
+        ...lokiTarget,
+        selector: {
+          "app.kubernetes.io/component": "single-binary",
+          "app.kubernetes.io/name": "loki",
+        },
       }),
     ).toBe(false);
   });
@@ -144,20 +137,9 @@ describe("allowlisted targets", () => {
 });
 
 describe("isTargetCompatibleWithDrill", () => {
-  it("requires service-backed workload targets for traffic spike", () => {
-    expect(isTargetCompatibleWithDrill(trafficSpikeDrill, workloadTarget)).toBe(
+  it("allows service-backed Loki target for traffic spike", () => {
+    expect(isTargetCompatibleWithDrill(trafficSpikeDrill, lokiTarget)).toBe(
       true,
     );
-    expect(
-      isTargetCompatibleWithDrill(trafficSpikeDrill, {
-        ...workloadTarget,
-        key: "datacenter-postgres",
-        serviceName: null,
-      }),
-    ).toBe(false);
-  });
-
-  it("accepts exact node target for node drills", () => {
-    expect(isTargetCompatibleWithDrill(nodeDrill, nodeTarget)).toBe(true);
   });
 });

@@ -22,6 +22,13 @@
       "when": 1774976400000,
       "tag": "0002_dashboard_phase4_multi_target",
       "breakpoints": true
+    },
+    {
+      "idx": 3,
+      "version": "7",
+      "when": 1775066400000,
+      "tag": "0003_dashboard_phase4_target_fixes",
+      "breakpoints": true
     }
   ]
 }

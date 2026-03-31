@@ -13,7 +13,10 @@ export function buildPodChaosManifest(input: {
   runId: string;
   target: DrillTargetRecord;
 }): PodChaosManifest {
-  if (input.target.kind !== "workload" || input.drill.template.executor !== "podChaos") {
+  if (
+    input.target.kind !== "workload" ||
+    input.drill.template.executor !== "podChaos"
+  ) {
     throw new Error("Invalid pod chaos input");
   }
 
@@ -50,7 +53,10 @@ export function buildNetworkChaosManifest(input: {
   runId: string;
   target: DrillTargetRecord;
 }): NetworkChaosManifest {
-  if (input.target.kind !== "workload" || input.drill.template.executor !== "networkChaos") {
+  if (
+    input.target.kind !== "workload" ||
+    input.drill.template.executor !== "networkChaos"
+  ) {
     throw new Error("Invalid network chaos input");
   }
 

@@ -24,7 +24,7 @@ export function isAllowedWorkloadTarget(target: DrillTargetRecord) {
     [
       "istiod",
       "istio-system",
-      { "app.kubernetes.io/name": "istiod" },
+      { app: "istiod" },
     ],
     [
       "datacenter-postgres",
@@ -36,7 +36,7 @@ export function isAllowedWorkloadTarget(target: DrillTargetRecord) {
       "observability",
       {
         "app.kubernetes.io/component": "single-binary",
-        "app.kubernetes.io/name": "loki",
+        "app.kubernetes.io/instance": "loki",
       },
     ],
   ] as const;

@@ -39,11 +39,19 @@ describe("selectDrainablePods", () => {
     expect(
       selectDrainablePods([
         {
-          metadata: { name: "daemon", namespace: "kube-system", ownerReferences: [{ kind: "DaemonSet" }] },
+          metadata: {
+            name: "daemon",
+            namespace: "kube-system",
+            ownerReferences: [{ kind: "DaemonSet" }],
+          },
           status: { phase: "Running" },
         },
         {
-          metadata: { annotations: { "kubernetes.io/config.mirror": "mirror" }, name: "mirror", namespace: "kube-system" },
+          metadata: {
+            annotations: { "kubernetes.io/config.mirror": "mirror" },
+            name: "mirror",
+            namespace: "kube-system",
+          },
           status: { phase: "Running" },
         },
         {

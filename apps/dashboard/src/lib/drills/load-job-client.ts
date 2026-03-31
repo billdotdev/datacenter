@@ -9,7 +9,10 @@ export function buildLoadJobManifest(input: {
   runId: string;
   target: DrillTargetRecord;
 }): V1Job {
-  if (input.target.kind !== "workload" || input.drill.template.executor !== "loadJob") {
+  if (
+    input.target.kind !== "workload" ||
+    input.drill.template.executor !== "loadJob"
+  ) {
     throw new Error("Invalid load job input");
   }
 

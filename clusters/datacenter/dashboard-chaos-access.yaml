@@ -33,6 +33,170 @@ subjects:
     namespace: dashboard
 ---
 apiVersion: rbac.authorization.k8s.io/v1
+kind: Role
+metadata:
+  name: dashboard-drill-target-access
+  namespace: dashboard
+rules:
+  - apiGroups:
+      - ""
+    resources:
+      - pods
+    verbs:
+      - get
+      - list
+      - watch
+  - apiGroups:
+      - chaos-mesh.org
+    resources:
+      - '*'
+    verbs:
+      - create
+      - delete
+      - get
+      - list
+      - patch
+      - update
+      - watch
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: dashboard-drill-target-access
+  namespace: dashboard
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: Role
+  name: dashboard-drill-target-access
+subjects:
+  - kind: ServiceAccount
+    name: dashboard
+    namespace: dashboard
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: Role
+metadata:
+  name: dashboard-drill-target-access
+  namespace: istio-system
+rules:
+  - apiGroups:
+      - ""
+    resources:
+      - pods
+    verbs:
+      - get
+      - list
+      - watch
+  - apiGroups:
+      - chaos-mesh.org
+    resources:
+      - '*'
+    verbs:
+      - create
+      - delete
+      - get
+      - list
+      - patch
+      - update
+      - watch
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: dashboard-drill-target-access
+  namespace: istio-system
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: Role
+  name: dashboard-drill-target-access
+subjects:
+  - kind: ServiceAccount
+    name: dashboard
+    namespace: dashboard
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: Role
+metadata:
+  name: dashboard-drill-target-access
+  namespace: database
+rules:
+  - apiGroups:
+      - ""
+    resources:
+      - pods
+    verbs:
+      - get
+      - list
+      - watch
+  - apiGroups:
+      - chaos-mesh.org
+    resources:
+      - '*'
+    verbs:
+      - create
+      - delete
+      - get
+      - list
+      - patch
+      - update
+      - watch
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: dashboard-drill-target-access
+  namespace: database
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: Role
+  name: dashboard-drill-target-access
+subjects:
+  - kind: ServiceAccount
+    name: dashboard
+    namespace: dashboard
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: Role
+metadata:
+  name: dashboard-drill-target-access
+  namespace: observability
+rules:
+  - apiGroups:
+      - ""
+    resources:
+      - pods
+    verbs:
+      - get
+      - list
+      - watch
+  - apiGroups:
+      - chaos-mesh.org
+    resources:
+      - '*'
+    verbs:
+      - create
+      - delete
+      - get
+      - list
+      - patch
+      - update
+      - watch
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: dashboard-drill-target-access
+  namespace: observability
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: Role
+  name: dashboard-drill-target-access
+subjects:
+  - kind: ServiceAccount
+    name: dashboard
+    namespace: dashboard
+---
+apiVersion: rbac.authorization.k8s.io/v1
 kind: ClusterRole
 metadata:
   name: dashboard-drill-operator

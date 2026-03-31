@@ -81,7 +81,8 @@ export function DrillCatalog({
               {drill.blastRadiusSummary}
             </p>
             <p className="mt-2 text-sm text-[var(--sea-ink-soft)]">
-              Target: <code>{selectedTarget?.targetSummary ?? "No compatible targets"}</code>
+              Target:{" "}
+              <code>{selectedTarget?.targetSummary ?? "No compatible targets"}</code>
             </p>
             {drill.targets.length > 0 ? (
               <label
@@ -147,6 +148,9 @@ export function DrillCatalog({
                   <span>{run.status}</span>
                 </div>
                 <p className="mt-2 text-sm text-[var(--sea-ink-soft)]">
+                  {run.drillKey}
+                </p>
+                <p className="mt-1 text-sm text-[var(--sea-ink-soft)]">
                   {run.targetSummary}
                 </p>
                 {run.errorMessage ? (

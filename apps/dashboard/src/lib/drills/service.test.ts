@@ -74,10 +74,7 @@ describe("readDrillCatalogData", () => {
     expect(result.disruptiveActionsEnabled).toBe(false);
     expect(result.drills[0]).toMatchObject({
       key: "pod-delete",
-      targets: [
-        { key: "dashboard" },
-        { key: "datacenter-postgres" },
-      ],
+      targets: [{ key: "dashboard" }, { key: "datacenter-postgres" }],
     });
     expect(result.drills[1]).toMatchObject({
       key: "traffic-spike",
